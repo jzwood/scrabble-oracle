@@ -1,0 +1,26 @@
+import gleam/dict.{type Dict}
+
+// MODIFIED FROM GLEAM/LIST TO INCLUDE VALUE TRANSFORM
+pub fn group(list: List(v), by key: fn(v) -> k, transform fxn: fn(v) -> z) -> Dict(k, List(z)) {
+  group_loop(list, key, fxn, dict.new())
+}
+
+fn group_loop(
+  list: List(v),
+  to_key: fn(v) -> k,
+  to_val: fn(v) -> z,
+  groups: Dict(k, List(z)),
+) -> Dict(k, List(z)) {
+  case list {
+    [] -> groups
+    [first, ..rest] -> {
+      let key = to_key(first)
+      let val = to_val(first)
+      let groups = case dict.get(groups, key) {
+        Error(_) -> dict.insert(groups, key, [val])
+        Ok(existing) -> dict.insert(groups, key, [val, ..existing])
+      }
+      group_loop(rest, to_key, to_val, groups)
+    }
+  }
+}
