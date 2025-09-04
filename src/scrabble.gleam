@@ -47,9 +47,8 @@ pub fn calculate_plays(board: Board, rack: Rack, dictionary) {
   |> list_extra.group(by: pair.first, transform: pair.second)
   |> dict.fold([], fn(acc, cloze: Cloze, playspots: List(Playspot)) {
     let words: List(String) = cloze_words(cloze, rack, dictionary)
-    [pairs(words, playspots), ..acc]
+    list_extra.append(pairs(words, playspots), acc)
   })
-  |> list.flatten
   |> list.filter(is_valid(_, board, dictionary))
   //|> list.map(score(_, board))
 }

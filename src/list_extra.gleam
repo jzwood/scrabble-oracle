@@ -24,3 +24,10 @@ fn group_loop(
     }
   }
 }
+
+pub fn append(first: List(a), second: List(a)) -> List(a) {
+  case first {
+    [] -> second
+    [first, ..rest] -> append(rest, [first, ..second])
+  }
+}
