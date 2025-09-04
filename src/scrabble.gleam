@@ -38,10 +38,13 @@ pub type Trie {
   Node(node: String, children: Trie)
 }
 pub type Cloze = List(String) // "__X__R"
+pub type Dictionary = Dict(Int, List(String))
+// maybe instead we can do  Dict(Int, Trie) that way we can shortcircuit after
+// first known letter
 
 // scoring
 
-pub fn calculate_plays(board: Board, rack: Rack, dictionary) {
+pub fn calculate_plays(board: Board, rack: Rack, dictionary: Dictionary) {
   all_playspots(board)
   |> list.map(get_cloze(board, _))
   |> list_extra.group(by: pair.first, transform: pair.second)
@@ -61,11 +64,11 @@ fn get_cloze(board: Board, playspot: Playspot) -> #(Cloze, Playspot) {
 
 }
 
-fn cloze_words(cloze: Cloze, rack: Rack, dictionary) -> List(String) {
+fn cloze_words(cloze: Cloze, rack: Rack, dictionary: Dictionary) -> List(String) {
 
 }
 
-fn is_valid(cloze_playspot: #(String, Playspot), board: Board, dictionary) {
+fn is_valid(cloze_playspot: #(String, Playspot), board: Board, dictionary: Dictionary) {
 
 }
 
