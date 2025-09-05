@@ -52,12 +52,9 @@ let scrabble_words = ...
 list.fold(scrabble_words, dict.new(), fn(acc, word) {
     let length = string.length(word)
     to_graphemes(word)
-    |> list.index_fold(acc, fn(acc, char, index) {
-        dict.upsert(acc, #(length, index, char), fn(words) {
-            case words {
-              Some(words) -> [word, ..words]
-              None -> [word]
-            }
-        })
-    })
+    |> list.index_map(pair.new)
+    |> list_extra.group_inner(_, to_key: fn(tup) {
+        let #(char, index) = tup
+        #(length, index, char)
+    }, to_val: pair.first, acc)
 })
