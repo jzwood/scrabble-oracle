@@ -53,8 +53,9 @@ list.fold(scrabble_words, dict.new(), fn(acc, word) {
     let length = string.length(word)
     to_graphemes(word)
     |> list.index_map(pair.new)
+    |> list.prepend(_, #("", -1))
     |> list_extra.group_inner(_, to_key: fn(tup) {
         let #(char, index) = tup
         #(length, index, char)
-    }, to_val: pair.first, acc)
+    }, to_val: fn() { word }, acc)
 })

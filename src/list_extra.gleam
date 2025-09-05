@@ -1,7 +1,11 @@
 import gleam/dict.{type Dict}
 
 // MODIFIED FROM GLEAM/LIST TO INCLUDE VALUE TRANSFORM
-pub fn group(list: List(v), by key: fn(v) -> k, transform fxn: fn(v) -> z) -> Dict(k, List(z)) {
+pub fn group(
+  list: List(v),
+  by key: fn(v) -> k,
+  transform fxn: fn(v) -> z,
+) -> Dict(k, List(z)) {
   group_inner(list, key, fxn, dict.new())
 }
 

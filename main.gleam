@@ -7,7 +7,9 @@ type Rack {
   Rack(tiles: List(Tile))
 }
 
-type Board = Dict(#(Int, Int), value)
+type Board =
+  Dict(#(Int, Int), value)
+
 type Square {
   Bonus
   Rack
@@ -15,10 +17,10 @@ type Square {
 
 // scoring
 type Bonus {
- DoubleLetterScore
- TripleLetterScore
- DoubleWordScore
- TripleWordScore
+  DoubleLetterScore
+  TripleLetterScore
+  DoubleWordScore
+  TripleWordScore
 }
 
 pub fn calculate_plays(board, rack, dictionary) {
@@ -35,19 +37,19 @@ pub fn calculate_plays(board, rack, dictionary) {
 }
 
 fn all_playspots(board) {
-
+  todo
 }
 
 fn get_cloze(board, playspot) {
-
+  todo
 }
 
 fn close_words(cloze, rack, dictionary) {
-
+  todo
 }
 
 fn is_valid(word, board, dictionary) {
-
+  todo
 }
 
 fn pairs(xs, ys) {
