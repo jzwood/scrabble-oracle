@@ -1,13 +1,13 @@
 import gleam/dict.{type Dict}
-import gleam/function
 import gleam/io
 import gleam/list
-import gleam/option.{type Option, Some}
+import gleam/string
+import gleam/function
+import gleam/option.{type Option}
 import gleam/pair
 import gleam/result
-import gleam/string
+import gleam/set.{type Set}
 import list_extra
-import tuple_extra
 
 pub fn main() -> Nil {
   io.println("Hello from scrabble!")
@@ -49,15 +49,14 @@ pub type Cloze =
   List(Result(#(String, Int), Nil))
 
 // "__X__R"
-pub type Dictionary =
-  Dict(#(Int, Int, String), List(String))
+pub type Dictionary {
+  Dictionary(
+    clozes: Dict(#(Int, Int, String), List(String)),
+    words: Set(String),
+  )
+}
 
-// maybe instead we can do  Dict(Int, Trie) that way we can shortcircuit after
-// first known letter
-
-// scoring
-
-pub fn calculate_plays(board: Board, rack: Rack, dictionary: Dictionary) {
+pub fn calculate_plays(board: Board, rack: Rack, dictionary: Dictionary) -> List(#(String, Int)) {
   all_playspots(board)
   |> list.map(get_cloze(board, _))
   |> list_extra.group(by: pair.first, transform: pair.second)
@@ -65,8 +64,7 @@ pub fn calculate_plays(board: Board, rack: Rack, dictionary: Dictionary) {
     let words: List(String) = cloze_words(cloze, rack, dictionary)
     list_extra.append(pairs(words, playspots), acc)
   })
-  |> list.filter(is_valid(_, board, dictionary))
-  |> list.map(score(_, board))
+  |> list.filter_map(score(_, board, dictionary))
 }
 
 fn build_default_key(length) {
@@ -79,14 +77,17 @@ fn build_key(length, cloze_char) {
 }
 
 // cloze length, index of first known letter, letter List(String) // word list
-fn build_dictionary(words: List(String)) -> Dictionary {
-  list.fold(words, dict.new(), fn(acc, word) {
-    let length = string.length(word)
-    string.to_graphemes(word)
-    |> list.index_map(fn(char, index) { #(length, index, char) })
-    |> list.prepend(build_default_key(length))
-    |> list_extra.group_inner(function.identity, fn(_) { word }, acc)
-  })
+fn build_cloze_dictionary(words: List(String)) -> Dictionary {
+  Dictionary(
+    list.fold(words, dict.new(), fn(acc, word) {
+      let length = string.length(word)
+      string.to_graphemes(word)
+      |> list.index_map(fn(char, index) { #(length, index, char) })
+      |> list.prepend(build_default_key(length))
+      |> list_extra.group_inner(function.identity, fn(_) { word }, acc)
+    }),
+    set.from_list(words),
+  )
 }
 
 fn all_playspots(board: Board) -> List(Playspot) {
@@ -105,19 +106,12 @@ fn cloze_words(cloze: Cloze, rack: Rack, dictionary: Dictionary) -> List(String)
     |> result.map(build_key(length, _))
     |> result.unwrap(build_default_key(length))
 
-  dict.get(dictionary, key)
+  dict.get(dictionary.clozes, key)
   |> result.unwrap([])
 }
 
-fn is_valid(
-  cloze_playspot: #(String, Playspot),
-  board: Board,
-  dictionary: Dictionary,
-) {
-  todo
-}
-
-fn score(cloze_playspot: #(String, Playspot), board: Board) {
+fn score(word_playspot: #(String, Playspot), board: Board, dictionary: Dictionary) -> Result(#(String, Int), Nil) {
+  let #(word, playspot) = word_playspot
   todo
 }
 
