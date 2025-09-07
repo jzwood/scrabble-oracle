@@ -46,7 +46,7 @@ pub type Board =
   Dict(Cell, Square)
 
 pub type Cloze =
-  List(Option(#(String, Int)))
+  List(Result(#(String, Int), Nil))
 
 // "__X__R"
 pub type Dictionary =
@@ -66,7 +66,7 @@ pub fn calculate_plays(board: Board, rack: Rack, dictionary: Dictionary) {
     list_extra.append(pairs(words, playspots), acc)
   })
   |> list.filter(is_valid(_, board, dictionary))
-  //|> list.map(score(_, board))
+  |> list.map(score(_, board))
 }
 
 fn build_default_key(length) {
@@ -99,11 +99,12 @@ fn get_cloze(board: Board, playspot: Playspot) -> #(Cloze, Playspot) {
 
 fn cloze_words(cloze: Cloze, rack: Rack, dictionary: Dictionary) -> List(String) {
   let length = list.length(cloze)
-  let maybe_key = list.find(cloze, option.is_some)
-  let key = case maybe_key {
-    Ok(Some(cloze_char)) -> build_key(length, cloze_char)
-    _ -> build_default_key(length)
-  }
+  let key =
+    list.find(cloze, result.is_ok)
+    |> result.flatten
+    |> result.map(build_key(length, _))
+    |> result.unwrap(build_default_key(length))
+
   dict.get(dictionary, key)
   |> result.unwrap([])
 }
@@ -116,7 +117,7 @@ fn is_valid(
   todo
 }
 
-fn score(word_playspot: #(String, Playspot)) {
+fn score(cloze_playspot: #(String, Playspot), board: Board) {
   todo
 }
 
