@@ -14,22 +14,41 @@ pub fn main() -> Nil {
 }
 ```
 
+## Prior Art
+- https://www.cs.cmu.edu/afs/cs/academic/class/15451-s06/www/lectures/scrabble.pdf
+
 ## Algorithm
+0. precompute dictionary with set of all words and lookups for cloze compatible words
+
+```
+pub type ClozeChar {
+  Char(char: String, index: Int)
+}
+
+pub type ClozeKey {
+  Key(length: Int, char: ClozeChar)
+  DefaultKey(length: Int)
+}
+
+pub type Dictionary {
+  Dictionary(clozes: Dict(ClozeKey, List(String)), words: Set(String))
+}
+```
+
 1. get coordinates (aka playspot) of every legal place to play (i.e. physically legal, no dictionary checks yet)
   e.g. <playspot> = [(x,y),(x,y),(x,y),(x,y),(x,y),(x,y),(x,y),(x,y)]
 2. pair each of these with their corresponding cloze
-  cloze example: `_R__`
+  cloze: `_R__`
   e.g. {<playspot>, `A_`}
 3. group these pairings by cloze
-  now each cloze will be associated with 1+ playspot coordinates
+  now each cloze will be associated with 1+ playspots
   e.g. %{<cloze>: list<playspot>}
-4. a) for every cloze find every possible string combo that the input rack can produce (implementation uses [trie](https://en.wikipedia.org/wiki/Trie))
-  these are random combinations of letters -- not necessarily real words
-  e.g. %{<cloze>: %{playspots: list<playspots>, words: list<word>}}
-4. b) ALT: for every cloze find every dictionary valid word that is compatible with cloze and rack.
+4. for every cloze find every dictionary valid word that is compatible with cloze and rack (using pre-computed dictionary)
   e.g. #(list<playspots>, list<word>)
-  can be decomposed into #(playspot, word)
+  4.1.
+    - decompose into #(playspot, word) pairs
 5. remove from list of letter combo/playspot coords any pairing that, if played, produces a word not in the dictionary
+  - check both main axis and all cross-axes
 6. score all remaining valid playable spots and order from highest point value to lowest
 
 

@@ -46,16 +46,15 @@ pub type Play =
 pub type Board =
   Dict(Cell, Square)
 
-pub type ClozeChar {
-  Char(char: String, index: Int)
-}
-
+// WE MIGHT WANT TO GET RID ClozeChar and just make it
+// List(Result(String, Nil))
+// we can lookup index at last possible moment to save us some complexity
 pub type Cloze =
-  List(Result(ClozeChar, Nil))
+  List(Result(String, Nil))
 
 // "__X__R"
 pub type ClozeKey {
-  Key(length: Int, char: ClozeChar)
+  Key(length: Int, index: Int, char: String)
   DefaultKey(length: Int)
 }
 
@@ -84,7 +83,7 @@ pub fn build_cloze_dictionary(words: List(String)) -> Dictionary {
     list.fold(words, dict.new(), fn(acc, word) {
       let length = string.length(word)
       string.to_graphemes(word)
-      |> list.index_map(fn(char, index) { Key(length, Char(char, index)) })
+      |> list.index_map(fn(char, index) { Key(length, index, char) })
       |> list.prepend(DefaultKey(length))
       |> list_extra.group_inner(function.identity, fn(_) { word }, acc)
     }),
@@ -102,14 +101,20 @@ fn get_cloze(board: Board, playspot: Playspot) -> #(Cloze, Playspot) {
 
 fn cloze_words(cloze: Cloze, rack: Rack, dictionary: Dictionary) -> List(String) {
   let length = list.length(cloze)
-  let key =
-    list.find(cloze, result.is_ok)
-    |> result.flatten
-    |> result.map(Key(length, _))
-    |> result.unwrap(DefaultKey(length))
+  let assert Ok(words) = dict.get(dictionary.clozes, DefaultKey(length))
 
-  dict.get(dictionary.clozes, key)
-  |> result.unwrap([])
+  list.index_fold(cloze, words, fn(acc, char, index) {
+    result.try(char, fn(char) {
+      dict.get(dictionary.clozes, Key(length, index, char))
+      |> result.map(fn(words) {
+        case list.length(words) < list.length(acc) {
+          True -> words
+          False -> acc
+        }
+      })
+    })
+    |> result.unwrap(acc)
+  })
 }
 
 fn score(
