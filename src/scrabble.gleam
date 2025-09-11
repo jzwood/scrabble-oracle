@@ -70,7 +70,7 @@ pub fn calculate_plays(
   |> list_extra.group(by: pair.first, transform: pair.second)
   |> dict.fold([], fn(acc, cloze: Cloze, playspots: List(Playspot)) {
     let words: List(String) = cloze_words(cloze, rack, dictionary)
-    list_extra.append(pairs(words, playspots), acc)
+    list_extra.append(list_extra.pairs(words, playspots), acc)
   })
   |> list.filter_map(score(_, board, dictionary))
 }
@@ -90,29 +90,28 @@ pub fn build_cloze_dictionary(words: List(String)) -> Dictionary {
 }
 
 fn all_playspots(board: Board) -> List(Playspot) {
-  //hwords = [[Coordinate (r, c + x) | x <- [0 .. (ws - 1)]] | r <- [0 .. 14], c <- [0 .. (15 - ws)], ws <- [2 .. 15]]
-  //vwords = [[Coordinate (r + y, c) | y <- [0 .. (ws - 1)]] | c <- [0 .. 14], r <- [0 .. (15 - ws)], ws <- [2 .. 15]]
-
   let shortest_word = 2
   let longest_word = 15
   let word_sizes = list.range(shortest_word, longest_word)
   list.flat_map(word_sizes, fn(word_size) {
-    let rows = list.range(0, longest_word - 1)
     // every row
+    let rows = list.range(0, longest_word - 1)
+    // every col for start of word where word fits
     let cols = list.range(0, longest_word - word_size)
-    // every col where word fits
+    // word's char indexes
+    let cells = list.range(0, word_size - 1)
 
-    pairs(rows, cols)
+    list_extra.pairs(rows, cols)
     |> list.flat_map(fn(tup) {
+
       let #(r, c) = tup
-      let cells = list.range(0, word_size - 1)
-      let hwords = list.map(cells, fn(x) { Cell(r, c + x) })
-      // get straight on (x, y) vs (r, c)
+      let hword = list.map(cells, fn(x) { Cell(r, c + x) })
 
+      // transpose of hword
       let #(c, r) = tup
-      let vwords = list.map(cells, fn(y) { Cell(r + y, c) })
+      let vword = list.map(cells, fn(y) { Cell(r + y, c) })
 
-      [hwords, vwords]
+      [hword, vword]
     })
   })
 }
@@ -148,10 +147,6 @@ fn score(
   todo
 }
 
-fn pairs(xs: List(a), ys: List(b)) -> List(#(a, b)) {
-  list.flat_map(xs, fn(x) { list.map(ys, fn(y) { #(x, y) }) })
-}
-
-fn pairs_by(xs: List(a), ys: List(b), fxn: fn(a, b) -> c) -> List(c) {
-  list.flat_map(xs, fn(x) { list.map(ys, fn(y) { fxn(x, y) }) })
-}
+//fn pairs_by(xs: List(a), ys: List(b), fxn: fn(a, b) -> c) -> List(c) {
+  //list.flat_map(xs, fn(x) { list.map(ys, fn(y) { fxn(x, y) }) })
+//}

@@ -1,3 +1,4 @@
+import gleam/list
 import gleam/dict.{type Dict}
 
 // MODIFIED FROM GLEAM/LIST TO INCLUDE VALUE TRANSFORM
@@ -34,4 +35,8 @@ pub fn append(first: List(a), second: List(a)) -> List(a) {
     [] -> second
     [first, ..rest] -> append(rest, [first, ..second])
   }
+}
+
+pub fn pairs(xs: List(a), ys: List(b)) -> List(#(a, b)) {
+  list.flat_map(xs, fn(x) { list.map(ys, fn(y) { #(x, y) }) })
 }
