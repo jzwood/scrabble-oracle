@@ -40,15 +40,11 @@ pub type Cell {
 pub type Playspot =
   List(Cell)
 
-pub type Play =
-  List(#(Cell, Square))
+//pub type Play = List(#(Cell, Square))
 
 pub type Board =
   Dict(Cell, Square)
 
-// WE MIGHT WANT TO GET RID ClozeChar and just make it
-// List(Result(String, Nil))
-// we can lookup index at last possible moment to save us some complexity
 pub type Cloze =
   List(Result(String, Nil))
 
@@ -61,6 +57,8 @@ pub type ClozeKey {
 pub type Dictionary {
   Dictionary(clozes: Dict(ClozeKey, List(String)), words: Set(String))
 }
+
+const board_size = 15
 
 pub fn calculate_plays(
   board: Board,
@@ -92,7 +90,31 @@ pub fn build_cloze_dictionary(words: List(String)) -> Dictionary {
 }
 
 fn all_playspots(board: Board) -> List(Playspot) {
-  todo
+  //hwords = [[Coordinate (r, c + x) | x <- [0 .. (ws - 1)]] | r <- [0 .. 14], c <- [0 .. (15 - ws)], ws <- [2 .. 15]]
+  //vwords = [[Coordinate (r + y, c) | y <- [0 .. (ws - 1)]] | c <- [0 .. 14], r <- [0 .. (15 - ws)], ws <- [2 .. 15]]
+
+  let shortest_word = 2
+  let longest_word = 15
+  let word_sizes = list.range(shortest_word, longest_word)
+  list.flat_map(word_sizes, fn(word_size) {
+    let rows = list.range(0, longest_word - 1)
+    // every row
+    let cols = list.range(0, longest_word - word_size)
+    // every col where word fits
+
+    pairs(rows, cols)
+    |> list.flat_map(fn(tup) {
+      let #(r, c) = tup
+      let cells = list.range(0, word_size - 1)
+      let hwords = list.map(cells, fn(x) { Cell(r, c + x) })
+      // get straight on (x, y) vs (r, c)
+
+      let #(c, r) = tup
+      let vwords = list.map(cells, fn(y) { Cell(r + y, c) })
+
+      [hwords, vwords]
+    })
+  })
 }
 
 fn get_cloze(board: Board, playspot: Playspot) -> #(Cloze, Playspot) {
@@ -128,4 +150,8 @@ fn score(
 
 fn pairs(xs: List(a), ys: List(b)) -> List(#(a, b)) {
   list.flat_map(xs, fn(x) { list.map(ys, fn(y) { #(x, y) }) })
+}
+
+fn pairs_by(xs: List(a), ys: List(b), fxn: fn(a, b) -> c) -> List(c) {
+  list.flat_map(xs, fn(x) { list.map(ys, fn(y) { fxn(x, y) }) })
 }

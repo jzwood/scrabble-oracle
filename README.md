@@ -21,12 +21,8 @@ pub fn main() -> Nil {
 0. precompute dictionary with set of all words and lookups for cloze compatible words
 
 ```
-pub type ClozeChar {
-  Char(char: String, index: Int)
-}
-
 pub type ClozeKey {
-  Key(length: Int, char: ClozeChar)
+  Key(length: Int, index: Int, char: String)
   DefaultKey(length: Int)
 }
 
@@ -36,20 +32,20 @@ pub type Dictionary {
 ```
 
 1. get coordinates (aka playspot) of every legal place to play (i.e. physically legal, no dictionary checks yet)
-  e.g. <playspot> = [(x,y),(x,y),(x,y),(x,y),(x,y),(x,y),(x,y),(x,y)]
-2. pair each of these with their corresponding cloze
+  e.g. <playspot> := [(x,y),(x,y),(x,y),(x,y),(x,y),(x,y),(x,y),(x,y)]
+2. pair each of these with their corresponding cloze on the board
   cloze: `_R__`
   e.g. {<playspot>, `A_`}
 3. group these pairings by cloze
   now each cloze will be associated with 1+ playspots
   e.g. %{<cloze>: list<playspot>}
-4. for every cloze find every dictionary valid word that is compatible with cloze and rack (using pre-computed dictionary)
+4. for every cloze find every dictionary valid word that is compatible with cloze and rack
+  - use pre-computed dictionary to get filtered list of words, then perform linear scan
   e.g. #(list<playspots>, list<word>)
-  4.1.
-    - decompose into #(playspot, word) pairs
-5. remove from list of letter combo/playspot coords any pairing that, if played, produces a word not in the dictionary
+5. decompose into #(playspot, word) pairs
+6. remove from list of letter combo/playspot coords any pairing that, if played, produces a word not in the dictionary
   - check both main axis and all cross-axes
-6. score all remaining valid playable spots and order from highest point value to lowest
+7. score all remaining valid playable spots and order from highest point value to lowest
 
 
 @TODO
