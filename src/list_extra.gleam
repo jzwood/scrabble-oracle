@@ -1,5 +1,5 @@
-import gleam/list
 import gleam/dict.{type Dict}
+import gleam/list
 
 // MODIFIED FROM GLEAM/LIST TO INCLUDE VALUE TRANSFORM
 pub fn group(

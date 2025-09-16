@@ -2,8 +2,7 @@ import gleam/dict.{type Dict}
 import gleam/function
 import gleam/io
 import gleam/list
-import gleam/option.{type Option}
-import gleam/order.{type Order}
+import gleam/option.{type Option, None}
 import gleam/pair
 import gleam/result
 import gleam/set.{type Set}
@@ -14,8 +13,23 @@ pub fn main() -> Nil {
   io.println("Hello from scrabble!")
 }
 
+type Direction {
+  Up
+  Right
+  Down
+  Left
+}
+
+type Axis {
+  Horizontal
+  Vertical
+}
+
+type Char =
+  String
+
 pub type Tile {
-  Tile(char: String, value: Int)
+  Tile(char: Char, value: Int)
   Blank
 }
 
@@ -46,19 +60,17 @@ pub type Board =
   Dict(Cell, Square)
 
 pub type Cloze =
-  List(Result(String, Nil))
+  List(Result(Char, Nil))
 
 // "__X__R"
 pub type ClozeKey {
-  Key(length: Int, index: Int, char: String)
+  Key(length: Int, index: Int, char: Char)
   DefaultKey(length: Int)
 }
 
 pub type Dictionary {
-  Dictionary(clozes: Dict(ClozeKey, List(String)), words: Set(String))
+  Dictionary(clozes: Dict(ClozeKey, List(Char)), words: Set(String))
 }
-
-const board_size = 15
 
 pub fn calculate_plays(
   board: Board,
@@ -101,26 +113,59 @@ fn all_playspots(board: Board) -> List(Playspot) {
     // word's char indexes
     let cells = list.range(0, word_size - 1)
 
-    list_extra.pairs(rows, cols)
-    |> list.flat_map(fn(tup) {
+    let pairs = list_extra.pairs(cols, rows)
 
-      let #(r, c) = tup
-      let hword = list.map(cells, fn(x) { Cell(r, c + x) })
+    let hwords =
+      list.filter_map(pairs, fn(tup) {
+        let #(c, r) = tup
+        case is_subword(board, Cell(c - 1, r), Cell(c + word_size, r)) {
+          True -> Error(Nil)
+          False -> Ok(list.map(cells, fn(x) { Cell(c + x, r) }))
+        }
+      })
 
-      // transpose of hword
-      let #(c, r) = tup
-      let vword = list.map(cells, fn(y) { Cell(r + y, c) })
+    let vwords =
+      list.filter_map(pairs, fn(tup) {
+        let #(r, c) = tup
+        case is_subword(board, Cell(c, r - 1), Cell(c, r + word_size)) {
+          True -> Error(Nil)
+          False -> Ok(list.map(cells, fn(y) { Cell(c, r + y) }))
+        }
+      })
 
-      [hword, vword]
-    })
+    list_extra.append(hwords, vwords)
   })
+  |> list.filter(list.any(_, is_tile_empty(board, _)))
+}
+
+// MAYBE NOT USED??
+fn adjacent_cell(cell: Cell, dir: Direction) -> Cell {
+  let Cell(x, y) = cell
+  case dir {
+    Up -> Cell(x, y + 1)
+    Right -> Cell(x, y)
+    Down -> Cell(x, y - 1)
+    Left -> Cell(x - 1, y)
+  }
+}
+
+fn is_subword(board: Board, before_start: Cell, after_end: Cell) -> Bool {
+  !list.all([before_start, after_end], is_tile_empty(board, _))
+}
+
+fn is_tile_empty(board: Board, cell: Cell) -> Bool {
+  case dict.get(board, cell) {
+    Error(Nil) -> True
+    Ok(Square(None, _)) -> True
+    _ -> False
+  }
 }
 
 fn get_cloze(board: Board, playspot: Playspot) -> #(Cloze, Playspot) {
   todo
 }
 
-fn cloze_words(cloze: Cloze, rack: Rack, dictionary: Dictionary) -> List(String) {
+fn cloze_words(cloze: Cloze, rack: Rack, dictionary: Dictionary) -> List(Char) {
   let length = list.length(cloze)
   let assert Ok(words) = dict.get(dictionary.clozes, DefaultKey(length))
 
@@ -146,7 +191,6 @@ fn score(
   let #(word, playspot) = word_playspot
   todo
 }
-
 //fn pairs_by(xs: List(a), ys: List(b), fxn: fn(a, b) -> c) -> List(c) {
-  //list.flat_map(xs, fn(x) { list.map(ys, fn(y) { fxn(x, y) }) })
+//list.flat_map(xs, fn(x) { list.map(ys, fn(y) { fxn(x, y) }) })
 //}
