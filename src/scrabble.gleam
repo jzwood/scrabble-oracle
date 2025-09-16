@@ -150,11 +150,24 @@ fn adjacent_cell(cell: Cell, dir: Direction) -> Cell {
   }
 }
 
-// OH SNAP, THIS IS WRONG. WE NEED WORD LENGTH TO GET RIGHT AND BOTTOM CORRECT
-// -- NEEDS A RETHINK
+/// confirms that the letter before and after playspot is either empty or off the board.
 fn is_not_subword(board: Board, playspot: Playspot) -> Bool {
-  //list.all(dirs, fn(dir) { is_square_empty(board, adjacent_cell(cell, dir)) })
-  todo
+  case list.first(playspot), list.last(playspot) {
+    Ok(Cell(x1, y1) as cell1), Ok(Cell(x2, y2) as cell2) ->
+      case x1 < x2, y1 < y2 {
+        True, False -> [
+          adjacent_cell(cell1, Left),
+          adjacent_cell(cell2, Right),
+        ]
+        False, True -> [
+          adjacent_cell(cell1, Up),
+          adjacent_cell(cell2, Down),
+        ]
+        _, _ -> panic as "playspots must have 1 and only 1 axis"
+      }
+    _, _ -> panic as "impossible zero length playspot"
+  }
+  |> list.all(is_square_empty(board, _))
 }
 
 fn has_empty_square(board: Board, playspot: Playspot) -> Bool {

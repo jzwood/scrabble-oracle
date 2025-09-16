@@ -37,6 +37,24 @@ pub fn append(first: List(a), second: List(a)) -> List(a) {
   }
 }
 
+pub fn filter(list: List(a), keeping predicate: fn(a) -> Bool) -> List(a) {
+  list.fold(list, [], fn(acc, a) {
+    case predicate(a) {
+      False -> acc
+      True -> [a, ..acc]
+    }
+  })
+}
+
+pub fn exclude(list: List(a), excluding predicate: fn(a) -> Bool) -> List(a) {
+  list.fold(list, [], fn(acc, a) {
+    case predicate(a) {
+      True -> acc
+      False -> [a, ..acc]
+    }
+  })
+}
+
 pub fn pairs(xs: List(a), ys: List(b)) -> List(#(a, b)) {
   list.flat_map(xs, fn(x) { list.map(ys, fn(y) { #(x, y) }) })
 }
