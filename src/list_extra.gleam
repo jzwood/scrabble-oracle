@@ -40,3 +40,7 @@ pub fn append(first: List(a), second: List(a)) -> List(a) {
 pub fn pairs(xs: List(a), ys: List(b)) -> List(#(a, b)) {
   list.flat_map(xs, fn(x) { list.map(ys, fn(y) { #(x, y) }) })
 }
+
+pub fn pairs_by(xs: List(a), ys: List(b), fxn: fn(a, b) -> c) -> List(c) {
+  list.flat_map(xs, fn(x) { list.map(ys, fn(y) { fxn(x, y) }) })
+}

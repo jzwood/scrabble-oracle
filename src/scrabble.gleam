@@ -113,32 +113,33 @@ fn all_playspots(board: Board) -> List(Playspot) {
     // word's char indexes
     let cells = list.range(0, word_size - 1)
 
-    let pairs = list_extra.pairs(cols, rows)
+    let pairs = list_extra.pairs_by(cols, rows, Cell)
 
     let hwords =
-      list.filter_map(pairs, fn(tup) {
-        let #(c, r) = tup
-        case is_subword(board, Cell(c - 1, r), Cell(c + word_size, r)) {
-          True -> Error(Nil)
-          False -> Ok(list.map(cells, fn(x) { Cell(c + x, r) }))
-        }
+      pairs
+      |> list.map(fn(cell) {
+        let Cell(c, r) = cell
+        list.map(cells, fn(x) { Cell(c + x, r) })
       })
 
     let vwords =
-      list.filter_map(pairs, fn(tup) {
-        let #(r, c) = tup
-        case is_subword(board, Cell(c, r - 1), Cell(c, r + word_size)) {
-          True -> Error(Nil)
-          False -> Ok(list.map(cells, fn(y) { Cell(c, r + y) }))
-        }
+      pairs
+      |> list.map(fn(cell) {
+        let Cell(c, r) = transpose_cell(cell)
+        list.map(cells, fn(y) { Cell(c, r + y) })
       })
 
     list_extra.append(hwords, vwords)
   })
-  |> list.filter(list.any(_, is_tile_empty(board, _)))
+  |> list.filter(is_not_subword(board, _))
+  |> list.filter(has_empty_square(board, _))
 }
 
-// MAYBE NOT USED??
+fn transpose_cell(cell: Cell) -> Cell {
+  let Cell(x, y) = cell
+  Cell(y, x)
+}
+
 fn adjacent_cell(cell: Cell, dir: Direction) -> Cell {
   let Cell(x, y) = cell
   case dir {
@@ -149,11 +150,18 @@ fn adjacent_cell(cell: Cell, dir: Direction) -> Cell {
   }
 }
 
-fn is_subword(board: Board, before_start: Cell, after_end: Cell) -> Bool {
-  !list.all([before_start, after_end], is_tile_empty(board, _))
+// OH SNAP, THIS IS WRONG. WE NEED WORD LENGTH TO GET RIGHT AND BOTTOM CORRECT
+// -- NEEDS A RETHINK
+fn is_not_subword(board: Board, playspot: Playspot) -> Bool {
+  //list.all(dirs, fn(dir) { is_square_empty(board, adjacent_cell(cell, dir)) })
+  todo
 }
 
-fn is_tile_empty(board: Board, cell: Cell) -> Bool {
+fn has_empty_square(board: Board, playspot: Playspot) -> Bool {
+  list.any(playspot, is_square_empty(board, _))
+}
+
+fn is_square_empty(board: Board, cell: Cell) -> Bool {
   case dict.get(board, cell) {
     Error(Nil) -> True
     Ok(Square(None, _)) -> True
@@ -191,6 +199,3 @@ fn score(
   let #(word, playspot) = word_playspot
   todo
 }
-//fn pairs_by(xs: List(a), ys: List(b), fxn: fn(a, b) -> c) -> List(c) {
-//list.flat_map(xs, fn(x) { list.map(ys, fn(y) { fxn(x, y) }) })
-//}
