@@ -2,7 +2,7 @@ import gleam/dict.{type Dict}
 import gleam/function
 import gleam/io
 import gleam/list
-import gleam/option.{type Option, None}
+import gleam/option.{type Option, None, Some}
 import gleam/pair
 import gleam/result
 import gleam/set.{type Set}
@@ -132,9 +132,7 @@ fn all_playspots(board: Board) -> List(Playspot) {
     list_extra.append(hwords, vwords)
   })
   |> list_extra.filter(is_not_subword(board, _))
-  |> list_extra.filter(fn(playspot) {
-    list.any(playspot, is_square_empty(board, _))
-  })
+  |> list_extra.filter(list.any(_, is_square_empty(board, _)))
 }
 
 fn transpose_cell(cell: Cell) -> Cell {
@@ -175,7 +173,14 @@ fn is_square_empty(board: Board, cell: Cell) -> Bool {
 }
 
 fn get_cloze(board: Board, playspot: Playspot) -> #(Cloze, Playspot) {
-  todo
+  let cloze =
+    list.map(playspot, fn(cell) {
+      case dict.get(board, cell) {
+        Ok(Square(Some(Tile(char, _)), _)) -> Ok(char)
+        _ -> Error(Nil)
+      }
+    })
+  #(cloze, playspot)
 }
 
 fn cloze_words(cloze: Cloze, rack: Rack, dictionary: Dictionary) -> List(Char) {
