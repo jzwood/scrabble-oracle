@@ -30,11 +30,11 @@ type Char =
 
 pub type Tile {
   Tile(char: Char, value: Int)
-  Blank
 }
 
-pub type Rack =
-  List(Tile)
+pub type Rack {
+  Rack(tiles: Dict(Tile, Int), num_blanks: Int)
+}
 
 pub type Bonus {
   DoubleLetterScore
@@ -101,10 +101,15 @@ pub fn build_cloze_dictionary(words: List(String)) -> Dictionary {
   )
 }
 
+fn build_adjacent_cells(board: Board) -> Set(Cell) {
+  todo
+}
+
 fn all_playspots(board: Board) -> List(Playspot) {
   let shortest_word = 2
   let longest_word = 15
   let word_sizes = list.range(shortest_word, longest_word)
+  let adjacent = build_adjacent_cells(board)
   list.flat_map(word_sizes, fn(word_size) {
     // every row
     let rows = list.range(0, longest_word - 1)
@@ -131,8 +136,9 @@ fn all_playspots(board: Board) -> List(Playspot) {
 
     list_extra.append(hwords, vwords)
   })
-  |> list_extra.filter(is_not_subword(board, _))
-  |> list_extra.filter(list.any(_, is_square_empty(board, _)))
+  |> list_extra.filter(fn(playspot) {
+      is_not_subword(board, playspot) && list.any(playspot, set.contains(adjacent, _)) && list.any(playspot, is_square_empty(board, _))
+    })
 }
 
 fn transpose_cell(cell: Cell) -> Cell {
@@ -140,14 +146,17 @@ fn transpose_cell(cell: Cell) -> Cell {
   Cell(y, x)
 }
 
-fn adjacent_cell(cell: Cell, dir: Direction) -> Cell {
-  let Cell(x, y) = cell
-  case dir {
-    Up -> Cell(x, y + 1)
-    Right -> Cell(x, y)
-    Down -> Cell(x, y - 1)
-    Left -> Cell(x - 1, y)
-  }
+fn pop_tile(char: Char, rack: Rack) -> #(Option(Tile), Rack) {
+  list.fold_right(rack, #(None, []), fn(acc, val) {
+    case acc {
+        #(Some(_) as tile, rack) -> #(tile, [char, ..rack])
+        #(None, rack) -> {
+          case val {
+            None -> #(Some(Tile(val, 0)), rack)
+          }
+        }
+      }
+  })
 }
 
 /// confirms that the letter before and after playspot is either empty or off the board.
@@ -183,7 +192,8 @@ fn get_cloze(board: Board, playspot: Playspot) -> #(Cloze, Playspot) {
   #(cloze, playspot)
 }
 
-fn cloze_words(cloze: Cloze, rack: Rack, dictionary: Dictionary) -> List(Char) {
+// NOT DONE. WE NEED TO FILTER OUT ALL WORDS THAT YOU COULD NOT PLAY WITH RACK
+fn cloze_words(cloze: Cloze, rack: Rack, dictionary: Dictionary) -> List(String) {
   let length = list.length(cloze)
   let assert Ok(words) = dict.get(dictionary.clozes, DefaultKey(length))
 
@@ -199,6 +209,7 @@ fn cloze_words(cloze: Cloze, rack: Rack, dictionary: Dictionary) -> List(Char) {
     })
     |> result.unwrap(acc)
   })
+  // TODO filter words that you could not play with your rack
 }
 
 fn score(
