@@ -131,8 +131,10 @@ fn all_playspots(board: Board) -> List(Playspot) {
 
     list_extra.append(hwords, vwords)
   })
-  |> list.filter(is_not_subword(board, _))
-  |> list.filter(has_empty_square(board, _))
+  |> list_extra.filter(is_not_subword(board, _))
+  |> list_extra.filter(fn(playspot) {
+    list.any(playspot, is_square_empty(board, _))
+  })
 }
 
 fn transpose_cell(cell: Cell) -> Cell {
@@ -155,23 +157,13 @@ fn is_not_subword(board: Board, playspot: Playspot) -> Bool {
   case list.first(playspot), list.last(playspot) {
     Ok(Cell(x1, y1) as cell1), Ok(Cell(x2, y2) as cell2) ->
       case x1 < x2, y1 < y2 {
-        True, False -> [
-          adjacent_cell(cell1, Left),
-          adjacent_cell(cell2, Right),
-        ]
-        False, True -> [
-          adjacent_cell(cell1, Up),
-          adjacent_cell(cell2, Down),
-        ]
+        True, False -> [Cell(x1 - 1, y1), Cell(x2 + 1, y2)]
+        False, True -> [Cell(x1, y1 - 1), Cell(x2, y2 + 2)]
         _, _ -> panic as "playspots must have 1 and only 1 axis"
       }
     _, _ -> panic as "impossible zero length playspot"
   }
   |> list.all(is_square_empty(board, _))
-}
-
-fn has_empty_square(board: Board, playspot: Playspot) -> Bool {
-  list.any(playspot, is_square_empty(board, _))
 }
 
 fn is_square_empty(board: Board, cell: Cell) -> Bool {
