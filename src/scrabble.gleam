@@ -33,7 +33,7 @@ pub type Tile {
 }
 
 pub type Rack {
-  Rack(tiles: Dict(Tile, Int), num_blanks: Int)
+  Rack(chars: List(Char), num_blanks: Int)
 }
 
 pub type Bonus {
@@ -102,12 +102,20 @@ pub fn build_cloze_dictionary(words: List(String)) -> Dictionary {
 }
 
 fn build_adjacent_cells(board: Board) -> Set(Cell) {
-  todo
+  dict.keys(board)
+  |> list.flat_map(fn(cell) {
+    let Cell(x, y) = cell
+    [Cell(x, y + 1), Cell(x + 1, y), Cell(x, y - 1), Cell(x - 1, y)]
+  })
+  |> list.filter(is_square_empty(board, _))
+  |> list.filter_map(dict.get(board, _))
+  |> set.from_list
 }
 
-fn all_playspots(board: Board) -> List(Playspot) {
+fn all_playspots(board: Board, rack: Rack) -> List(Playspot) {
   let shortest_word = 2
   let longest_word = 15
+  let rack_size = list.length(rack.chars) + rack.num_blanks
   let word_sizes = list.range(shortest_word, longest_word)
   let adjacent = build_adjacent_cells(board)
   list.flat_map(word_sizes, fn(word_size) {
@@ -137,8 +145,11 @@ fn all_playspots(board: Board) -> List(Playspot) {
     list_extra.append(hwords, vwords)
   })
   |> list_extra.filter(fn(playspot) {
-      is_not_subword(board, playspot) && list.any(playspot, set.contains(adjacent, _)) && list.any(playspot, is_square_empty(board, _))
-    })
+    is_not_subword(board, playspot)
+    && list.any(playspot, set.contains(adjacent, _))
+    && list.any(playspot, is_square_empty(board, _))
+    && list.count(playspot, is_square_empty(board, _)) <= rack_size
+  })
 }
 
 fn transpose_cell(cell: Cell) -> Cell {
@@ -149,13 +160,13 @@ fn transpose_cell(cell: Cell) -> Cell {
 fn pop_tile(char: Char, rack: Rack) -> #(Option(Tile), Rack) {
   list.fold_right(rack, #(None, []), fn(acc, val) {
     case acc {
-        #(Some(_) as tile, rack) -> #(tile, [char, ..rack])
-        #(None, rack) -> {
-          case val {
-            None -> #(Some(Tile(val, 0)), rack)
-          }
+      #(Some(_) as tile, rack) -> #(tile, [char, ..rack])
+      #(None, rack) -> {
+        case val {
+          None -> #(Some(Tile(val, 0)), rack)
         }
       }
+    }
   })
 }
 
