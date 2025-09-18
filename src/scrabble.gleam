@@ -8,6 +8,7 @@ import gleam/result
 import gleam/set.{type Set}
 import gleam/string
 import list_extra
+import stream
 
 pub fn main() -> Nil {
   io.println("Hello from scrabble!")
@@ -109,8 +110,10 @@ fn build_adjacent_cells(board: Board) -> Set(Cell) {
     let Cell(x, y) = cell
     [Cell(x, y + 1), Cell(x + 1, y), Cell(x, y - 1), Cell(x - 1, y)]
   })
-  |> list_extra.filter(is_on_board)
-  |> list_extra.filter(is_square_empty(board, _))
+  |> stream.new
+  |> stream.filter(is_on_board)
+  |> stream.filter(is_square_empty(board, _))
+  |> stream.eval
   |> set.from_list
 }
 
@@ -146,12 +149,12 @@ fn all_playspots(board: Board, rack: Rack) -> List(Playspot) {
 
     list_extra.append(hwords, vwords)
   })
-  |> list_extra.filter(fn(playspot) {
-    is_not_subword(board, playspot)
-    && list.any(playspot, set.contains(adjacent, _))
-    && list.any(playspot, is_square_empty(board, _))
-    && list.count(playspot, is_square_empty(board, _)) <= rack_size
-  })
+  |> stream.new
+  |> stream.filter(is_not_subword(board, _))
+  |> stream.filter(list.any(_, set.contains(adjacent, _)))
+  |> stream.filter(list.any(_, is_square_empty(board, _)))
+  |> stream.filter(rack_has_enough_letters(board, _, rack_size))
+  |> stream.eval
 }
 
 fn transpose_cell(cell: Cell) -> Cell {
@@ -184,6 +187,14 @@ fn is_not_subword(board: Board, playspot: Playspot) -> Bool {
     _, _ -> panic as "impossible zero length playspot"
   }
   |> list.all(is_square_empty(board, _))
+}
+
+fn rack_has_enough_letters(
+  board: Board,
+  playspot: Playspot,
+  rack_size: Int,
+) -> Bool {
+  list.count(playspot, is_square_empty(board, _)) <= rack_size
 }
 
 fn is_square_empty(board: Board, cell: Cell) -> Bool {

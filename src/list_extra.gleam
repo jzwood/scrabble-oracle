@@ -1,5 +1,6 @@
 import gleam/dict.{type Dict}
 import gleam/list
+import gleam/pair
 
 // MODIFIED FROM GLEAM/LIST TO INCLUDE VALUE TRANSFORM
 pub fn group(
@@ -44,6 +45,22 @@ pub fn filter(list: List(a), keeping predicate: fn(a) -> Bool) -> List(a) {
       True -> [a, ..acc]
     }
   })
+}
+
+pub fn fusion_new(list: List(a)) -> #(List(a), List(fn(a) -> Bool)) {
+  pair.new(list, [])
+}
+
+pub fn fusion_filter(
+  tup: #(List(a), List(fn(a) -> Bool)),
+  pred: fn(a) -> Bool,
+) -> #(List(a), List(fn(a) -> Bool)) {
+  pair.map_second(tup, list.prepend(_, pred))
+}
+
+pub fn fusion_eval(tup: #(List(a), List(fn(a) -> Bool))) -> List(a) {
+  let #(list, preds) = tup
+  filter(list, fn(a) { list.all(preds, fn(pred) { pred(a) }) })
 }
 
 pub fn exclude(list: List(a), excluding predicate: fn(a) -> Bool) -> List(a) {
