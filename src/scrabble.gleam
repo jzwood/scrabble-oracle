@@ -72,13 +72,15 @@ pub type Dictionary {
   Dictionary(clozes: Dict(ClozeKey, List(Char)), words: Set(String))
 }
 
+const board_size = 15
+
 pub fn calculate_plays(
   board: Board,
   rack: Rack,
   dictionary: Dictionary,
 ) -> List(#(String, Int)) {
-  all_playspots(board)
-  |> list.map(get_cloze(board, _))
+  all_playspots(board, rack)
+  |> list_extra.map(get_cloze(board, _))
   |> list_extra.group(by: pair.first, transform: pair.second)
   |> dict.fold([], fn(acc, cloze: Cloze, playspots: List(Playspot)) {
     let words: List(String) = cloze_words(cloze, rack, dictionary)
@@ -107,8 +109,8 @@ fn build_adjacent_cells(board: Board) -> Set(Cell) {
     let Cell(x, y) = cell
     [Cell(x, y + 1), Cell(x + 1, y), Cell(x, y - 1), Cell(x - 1, y)]
   })
-  |> list.filter(is_square_empty(board, _))
-  |> list.filter_map(dict.get(board, _))
+  |> list_extra.filter(is_on_board)
+  |> list_extra.filter(is_square_empty(board, _))
   |> set.from_list
 }
 
@@ -130,16 +132,16 @@ fn all_playspots(board: Board, rack: Rack) -> List(Playspot) {
 
     let hwords =
       pairs
-      |> list.map(fn(cell) {
+      |> list_extra.map(fn(cell) {
         let Cell(c, r) = cell
-        list.map(cells, fn(x) { Cell(c + x, r) })
+        list_extra.map(cells, fn(x) { Cell(c + x, r) })
       })
 
     let vwords =
       pairs
-      |> list.map(fn(cell) {
+      |> list_extra.map(fn(cell) {
         let Cell(c, r) = transpose_cell(cell)
-        list.map(cells, fn(y) { Cell(c, r + y) })
+        list_extra.map(cells, fn(y) { Cell(c, r + y) })
       })
 
     list_extra.append(hwords, vwords)
@@ -192,9 +194,14 @@ fn is_square_empty(board: Board, cell: Cell) -> Bool {
   }
 }
 
+fn is_on_board(cell: Cell) -> Bool {
+  let Cell(x, y) = cell
+  0 <= x && x < board_size && 0 <= y && y < board_size
+}
+
 fn get_cloze(board: Board, playspot: Playspot) -> #(Cloze, Playspot) {
   let cloze =
-    list.map(playspot, fn(cell) {
+    list_extra.map(playspot, fn(cell) {
       case dict.get(board, cell) {
         Ok(Square(Some(Tile(char, _)), _)) -> Ok(char)
         _ -> Error(Nil)
