@@ -84,10 +84,42 @@ pub fn calculate_plays(
   |> list_extra.map(get_cloze(board, _))
   |> list_extra.group(by: pair.first, transform: pair.second)
   |> dict.fold([], fn(acc, cloze: Cloze, playspots: List(Playspot)) {
-    let words: List(String) = cloze_words(cloze, rack, dictionary)
+    let words: List(String) =
+      cloze_words(cloze, dictionary)
+      |> list_extra.filter(rack_compatible(rack, cloze, _))
     list_extra.append(list_extra.pairs(words, playspots), acc)
   })
-  |> list.filter_map(score(_, board, dictionary))
+  |> list_extra.filter(legal_cross_words(_, board, dictionary))
+  |> list_extra.map(score(_, board, dictionary))
+}
+
+fn rack_compatible(rack: Rack, cloze: Cloze, word: String) -> Bool {
+  let chars =
+    case string.to_graphemes(word) |> list.strict_zip(cloze, _) {
+      Error(Nil) -> panic as "cloze and word lengths do not match"
+      Ok(pairs) ->
+        list.filter_map(pairs, fn(tup) {
+          case tup {
+            #(Ok(_), _) -> Error(Nil)
+            #(Error(Nil), char) -> Ok(char)
+          }
+        })
+    }
+    |> list.sort(string.compare)
+  let assert True = list_extra.is_sorted(rack.chars, string.compare)
+  let assert True = list_extra.is_sorted(chars, string.compare)
+  can_rack_play_word(rack, chars)
+}
+
+pub fn can_rack_play_word(rack: Rack, chars: List(Char)) -> Bool {
+  case rack, chars {
+    _, [] -> True
+    Rack([h1, ..t1], blanks), [h2, ..t2] if h1 == h2 ->
+      can_rack_play_word(Rack(t1, blanks), t2)
+    Rack(chars, blanks), [_, ..tail] if blanks > 0 ->
+      can_rack_play_word(Rack(chars, blanks - 1), tail)
+    _, _ -> False
+  }
 }
 
 // cloze length, index of first known letter, letter List(String) // word list
@@ -159,19 +191,6 @@ fn transpose_cell(cell: Cell) -> Cell {
   Cell(y, x)
 }
 
-fn pop_tile(char: Char, rack: Rack) -> #(Option(Tile), Rack) {
-  list.fold_right(rack, #(None, []), fn(acc, val) {
-    case acc {
-      #(Some(_) as tile, rack) -> #(tile, [char, ..rack])
-      #(None, rack) -> {
-        case val {
-          None -> #(Some(Tile(val, 0)), rack)
-        }
-      }
-    }
-  })
-}
-
 /// confirms that the letter before and after playspot is either empty or off the board.
 fn is_not_subword(board: Board, playspot: Playspot) -> Bool {
   case list.first(playspot), list.last(playspot) {
@@ -218,8 +237,7 @@ fn get_cloze(board: Board, playspot: Playspot) -> #(Cloze, Playspot) {
   #(cloze, playspot)
 }
 
-// NOT DONE. WE NEED TO FILTER OUT ALL WORDS THAT YOU COULD NOT PLAY WITH RACK
-fn cloze_words(cloze: Cloze, rack: Rack, dictionary: Dictionary) -> List(String) {
+fn cloze_words(cloze: Cloze, dictionary: Dictionary) -> List(String) {
   let length = list.length(cloze)
   let assert Ok(words) = dict.get(dictionary.clozes, DefaultKey(length))
 
@@ -235,14 +253,21 @@ fn cloze_words(cloze: Cloze, rack: Rack, dictionary: Dictionary) -> List(String)
     })
     |> result.unwrap(acc)
   })
-  // TODO filter words that you could not play with your rack
+}
+
+fn legal_cross_words(
+  word_playspot: #(String, Playspot),
+  board: Board,
+  dictionary: Dictionary,
+) -> Bool {
+  todo
 }
 
 fn score(
   word_playspot: #(String, Playspot),
   board: Board,
   dictionary: Dictionary,
-) -> Result(#(String, Int), Nil) {
+) -> #(String, Int) {
   let #(word, playspot) = word_playspot
   todo
 }

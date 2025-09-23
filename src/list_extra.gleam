@@ -1,5 +1,6 @@
 import gleam/dict.{type Dict}
 import gleam/list
+import gleam/order.{type Order, Eq, Gt, Lt}
 import gleam/pair
 
 // MODIFIED FROM GLEAM/LIST TO INCLUDE VALUE TRANSFORM
@@ -86,4 +87,17 @@ pub fn pairs_by(xs: List(a), ys: List(b), fxn: fn(a, b) -> c) -> List(c) {
 
 pub fn filter_all(xs: List(a), predicates: List(fn(a) -> Bool)) -> List(a) {
   filter(xs, fn(x) { list.all(predicates, fn(fxn) { fxn(x) }) })
+}
+
+pub fn is_sorted(xs: List(a), cmp: fn(a, a) -> Order) -> Bool {
+  case xs {
+    [] -> True
+    [_] -> True
+    [x, y, ..tail] -> {
+      case cmp(x, y) {
+        Lt | Eq -> is_sorted([y, ..tail], cmp)
+        Gt -> False
+      }
+    }
+  }
 }
