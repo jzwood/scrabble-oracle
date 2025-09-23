@@ -8,10 +8,24 @@ import gleam/result
 import gleam/set.{type Set}
 import gleam/string
 import list_extra
-import stream
 
-pub fn main() -> Nil {
-  io.println("Hello from scrabble!")
+pub fn main(
+  rack: String,
+  num_blanks: Int,
+  board: String,
+  word_list: List(String),
+) -> List(#(String, Int)) {
+  let dictionary: Dictionary = build_cloze_dictionary(word_list)
+  let rack: Rack =
+    Rack(string.to_graphemes(rack) |> list.sort(string.compare), num_blanks)
+  let board: Board =
+    string.split(board, "\n")
+    |> list.index_map(string.to_graphemes)
+    // TODO make #(x,y,val)
+    |> list.filter()
+    // filter out val "_"
+    |> dict.from_list
+  calculate_plays(board, rack, dictionary)
 }
 
 type Direction {
@@ -74,6 +88,10 @@ pub type Dictionary {
 }
 
 const board_size = 15
+
+pub fn init_board() -> Board {
+  todo
+}
 
 pub fn calculate_plays(
   board: Board,
