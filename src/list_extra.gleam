@@ -39,7 +39,7 @@ pub fn append(first: List(a), second: List(a)) -> List(a) {
 }
 
 pub fn filter(list: List(a), keeping predicate: fn(a) -> Bool) -> List(a) {
-  list.fold_right(list, [], fn(acc, a) {
+  list.fold(list, [], fn(acc, a) {
     case predicate(a) {
       False -> acc
       True -> [a, ..acc]
@@ -64,7 +64,7 @@ pub fn fusion_eval(tup: #(List(a), List(fn(a) -> Bool))) -> List(a) {
 }
 
 pub fn exclude(list: List(a), excluding predicate: fn(a) -> Bool) -> List(a) {
-  list.fold_right(list, [], fn(acc, a) {
+  list.fold(list, [], fn(acc, a) {
     case predicate(a) {
       True -> acc
       False -> [a, ..acc]
@@ -73,7 +73,7 @@ pub fn exclude(list: List(a), excluding predicate: fn(a) -> Bool) -> List(a) {
 }
 
 pub fn map(list: List(a), with fun: fn(a) -> b) -> List(b) {
-  list.fold_right(list, [], fn(acc, a) { [fun(a), ..acc] })
+  list.fold(list, [], fn(acc, a) { [fun(a), ..acc] })
 }
 
 pub fn pairs(xs: List(a), ys: List(b)) -> List(#(a, b)) {
@@ -82,4 +82,8 @@ pub fn pairs(xs: List(a), ys: List(b)) -> List(#(a, b)) {
 
 pub fn pairs_by(xs: List(a), ys: List(b), fxn: fn(a, b) -> c) -> List(c) {
   list.flat_map(xs, fn(x) { list.map(ys, fn(y) { fxn(x, y) }) })
+}
+
+pub fn filter_all(xs: List(a), predicates: List(fn(a) -> Bool)) -> List(a) {
+  filter(xs, fn(x) { list.all(predicates, fn(fxn) { fxn(x) }) })
 }

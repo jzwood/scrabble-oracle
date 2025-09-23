@@ -110,10 +110,7 @@ fn build_adjacent_cells(board: Board) -> Set(Cell) {
     let Cell(x, y) = cell
     [Cell(x, y + 1), Cell(x + 1, y), Cell(x, y - 1), Cell(x - 1, y)]
   })
-  |> stream.new
-  |> stream.filter(is_on_board)
-  |> stream.filter(is_square_empty(board, _))
-  |> stream.eval
+  |> list_extra.filter_all([is_on_board, is_square_empty(board, _)])
   |> set.from_list
 }
 
@@ -149,12 +146,12 @@ fn all_playspots(board: Board, rack: Rack) -> List(Playspot) {
 
     list_extra.append(hwords, vwords)
   })
-  |> stream.new
-  |> stream.filter(is_not_subword(board, _))
-  |> stream.filter(list.any(_, set.contains(adjacent, _)))
-  |> stream.filter(list.any(_, is_square_empty(board, _)))
-  |> stream.filter(rack_has_enough_letters(board, _, rack_size))
-  |> stream.eval
+  |> list_extra.filter_all([
+    is_not_subword(board, _),
+    list.any(_, set.contains(adjacent, _)),
+    list.any(_, is_square_empty(board, _)),
+    rack_has_enough_letters(board, _, rack_size),
+  ])
 }
 
 fn transpose_cell(cell: Cell) -> Cell {
