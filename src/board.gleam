@@ -1,7 +1,6 @@
 import gleam/dict
 import gleam/list
-import gleam/option.{type Option, None, Some}
-import gleam/result
+import gleam/option.{None, Some}
 import gleam/string
 
 import types.{
@@ -9,7 +8,7 @@ import types.{
   Square, Tile, TripleLetterScore, TripleWordScore,
 }
 
-pub fn init_board() -> Board {
+pub fn init() -> Board {
   let board: String =
     "
     4__1___4___1__4

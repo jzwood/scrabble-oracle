@@ -17,35 +17,18 @@ import types.{
 pub fn main(
   rack: String,
   num_blanks: Int,
-  board: String,
+  board_str: String,
   word_list: List(String),
-) -> List(#(String, Int)) {
+) -> Result(List(#(String, Int)), String) {
   let dictionary: Dictionary = build_cloze_dictionary(word_list)
   let rack: Rack =
     Rack(string.to_graphemes(rack) |> list.sort(string.compare), num_blanks)
-  let board: Board =
-    string.split(board, "\n")
-    |> list.index_map(fn(row, y) {
-      row
-      |> string.to_graphemes
-      |> list.index_map(fn(cell, x) {
-        #(Cell(x, y), cell_to_square(x, y, cell))
-      })
-    })
-    |> list.flatten
-    |> dict.from_list
-  calculate_plays(board, rack, dictionary)
-}
 
-pub fn cell_to_square(x: Int, y: Int, cell: String) -> Square {
-  Square(None, None)
+  board.parse_board(board_str)
+  |> result.map(calculate_plays(_, rack, dictionary))
 }
 
 const board_size = 15
-
-pub fn init_board() -> Board {
-  todo
-}
 
 pub fn calculate_plays(
   board: Board,
