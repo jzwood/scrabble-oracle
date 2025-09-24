@@ -1,13 +1,18 @@
-import gleam/dict.{type Dict}
+import board
+import gleam/dict
 import gleam/function
-import gleam/io
 import gleam/list
-import gleam/option.{type Option, None, Some}
+import gleam/option.{None, Some}
 import gleam/pair
 import gleam/result
 import gleam/set.{type Set}
 import gleam/string
 import list_extra
+import types.{
+  type Board, type Bonus, type Cell, type Char, type Cloze, type ClozeKey,
+  type Dictionary, type Playspot, type Rack, type Square, type Tile, Cell,
+  DefaultKey, Dictionary, Key, Rack, Square, Tile,
+}
 
 pub fn main(
   rack: String,
@@ -20,71 +25,20 @@ pub fn main(
     Rack(string.to_graphemes(rack) |> list.sort(string.compare), num_blanks)
   let board: Board =
     string.split(board, "\n")
-    |> list.index_map(string.to_graphemes)
-    // TODO make #(x,y,val)
-    |> list.filter()
-    // filter out val "_"
+    |> list.index_map(fn(row, y) {
+      row
+      |> string.to_graphemes
+      |> list.index_map(fn(cell, x) {
+        #(Cell(x, y), cell_to_square(x, y, cell))
+      })
+    })
+    |> list.flatten
     |> dict.from_list
   calculate_plays(board, rack, dictionary)
 }
 
-type Direction {
-  Up
-  Right
-  Down
-  Left
-}
-
-type Axis {
-  Horizontal
-  Vertical
-}
-
-type Char =
-  String
-
-pub type Tile {
-  Tile(char: Char, value: Int)
-}
-
-pub type Rack {
-  Rack(chars: List(Char), num_blanks: Int)
-}
-
-pub type Bonus {
-  DoubleLetterScore
-  TripleLetterScore
-  DoubleWordScore
-  TripleWordScore
-}
-
-pub type Square {
-  Square(tile: Option(Tile), bonus: Option(Bonus))
-}
-
-pub type Cell {
-  Cell(x: Int, y: Int)
-}
-
-pub type Playspot =
-  List(Cell)
-
-//pub type Play = List(#(Cell, Square))
-
-pub type Board =
-  Dict(Cell, Square)
-
-pub type Cloze =
-  List(Result(Char, Nil))
-
-// "__X__R"
-pub type ClozeKey {
-  Key(length: Int, index: Int, char: Char)
-  DefaultKey(length: Int)
-}
-
-pub type Dictionary {
-  Dictionary(clozes: Dict(ClozeKey, List(Char)), words: Set(String))
+pub fn cell_to_square(x: Int, y: Int, cell: String) -> Square {
+  Square(None, None)
 }
 
 const board_size = 15
@@ -160,6 +114,7 @@ fn build_adjacent_cells(board: Board) -> Set(Cell) {
     let Cell(x, y) = cell
     [Cell(x, y + 1), Cell(x + 1, y), Cell(x, y - 1), Cell(x - 1, y)]
   })
+  |> list.prepend(Cell(7, 7))
   |> list_extra.filter_all([is_on_board, is_square_empty(board, _)])
   |> set.from_list
 }
