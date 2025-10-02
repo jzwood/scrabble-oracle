@@ -14,27 +14,27 @@ import types.{
   DefaultKey, Dictionary, Key, Rack, Square, Tile,
 }
 
+const board_size = 15
+
 pub fn main(
-  rack: String,
+  rack_str: String,
   num_blanks: Int,
   board_str: String,
-  word_list: List(String),
-) -> Result(List(#(String, Int)), String) {
-  let dictionary: Dictionary = build_cloze_dictionary(word_list)
-  let rack: Rack =
-    Rack(string.to_graphemes(rack) |> list.sort(string.compare), num_blanks)
-
-  board.parse_board(board_str)
-  |> result.map(calculate_plays(_, rack, dictionary))
+  dictionary: Dictionary,
+  // make ahead of time
+) -> Result(List(#(String, Playspot, Int)), String) {
+  case board.parse_rack(rack_str, num_blanks), board.parse_board(board_str) {
+    Ok(rack), Ok(board) -> Ok(calculate_plays(board, rack, dictionary))
+    Error(err), _ -> Error(err)
+    _, Error(err) -> Error(err)
+  }
 }
-
-const board_size = 15
 
 pub fn calculate_plays(
   board: Board,
   rack: Rack,
   dictionary: Dictionary,
-) -> List(#(String, Int)) {
+) -> List(#(String, Playspot, Int)) {
   all_playspots(board, rack)
   |> list_extra.map(get_cloze(board, _))
   |> list_extra.group(by: pair.first, transform: pair.second)
@@ -66,6 +66,8 @@ fn rack_compatible(rack: Rack, cloze: Cloze, word: String) -> Bool {
   can_rack_play_word(rack, chars)
 }
 
+/// does the rack have the necessary tiles to play the word?
+/// simliar to `are chars subset of rack?` but also handles blanks
 pub fn can_rack_play_word(rack: Rack, chars: List(Char)) -> Bool {
   case rack, chars {
     _, [] -> True
@@ -161,6 +163,7 @@ fn is_not_subword(board: Board, playspot: Playspot) -> Bool {
   |> list.all(is_square_empty(board, _))
 }
 
+/// rules out playspots that require more letters than the rack has
 fn rack_has_enough_letters(
   board: Board,
   playspot: Playspot,
@@ -169,6 +172,7 @@ fn rack_has_enough_letters(
   list.count(playspot, is_square_empty(board, _)) <= rack_size
 }
 
+/// is cell's square off the board or empty?
 fn is_square_empty(board: Board, cell: Cell) -> Bool {
   case dict.get(board, cell) {
     Error(Nil) -> True
@@ -177,11 +181,13 @@ fn is_square_empty(board: Board, cell: Cell) -> Bool {
   }
 }
 
+/// is cell's square off the board?
 fn is_on_board(cell: Cell) -> Bool {
   let Cell(x, y) = cell
   0 <= x && x < board_size && 0 <= y && y < board_size
 }
 
+/// self-explanatory
 fn get_cloze(board: Board, playspot: Playspot) -> #(Cloze, Playspot) {
   let cloze =
     list_extra.map(playspot, fn(cell) {
@@ -193,6 +199,8 @@ fn get_cloze(board: Board, playspot: Playspot) -> #(Cloze, Playspot) {
   #(cloze, playspot)
 }
 
+/// gets every word list for each cloze (char, index) pair and returns the
+/// shortest of these word lists
 fn cloze_words(cloze: Cloze, dictionary: Dictionary) -> List(String) {
   let length = list.length(cloze)
   let assert Ok(words) = dict.get(dictionary.clozes, DefaultKey(length))
@@ -211,6 +219,7 @@ fn cloze_words(cloze: Cloze, dictionary: Dictionary) -> List(String) {
   })
 }
 
+/// filter predicate that disqualifies words based on the validity of cross-axis words
 fn legal_cross_words(
   word_playspot: #(String, Playspot),
   board: Board,
@@ -219,11 +228,13 @@ fn legal_cross_words(
   todo
 }
 
+/// assumes word is valid and scores it according to scrabble scoring rules,
+/// taking into account bonuses, cross-axis words, and bingos
 fn score(
   word_playspot: #(String, Playspot),
   board: Board,
   dictionary: Dictionary,
-) -> #(String, Int) {
+) -> #(String, Playspot, Int) {
   let #(word, playspot) = word_playspot
   todo
 }

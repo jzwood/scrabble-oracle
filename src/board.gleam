@@ -4,8 +4,8 @@ import gleam/option.{None, Some}
 import gleam/string
 
 import types.{
-  type Board, type Bonus, type Char, Cell, DoubleLetterScore, DoubleWordScore,
-  Square, Tile, TripleLetterScore, TripleWordScore,
+  type Board, type Bonus, type Char, type Rack, Cell, DoubleLetterScore,
+  DoubleWordScore, Rack, Square, Tile, TripleLetterScore, TripleWordScore,
 }
 
 pub fn init() -> Board {
@@ -36,33 +36,75 @@ pub fn init() -> Board {
   board
 }
 
-pub fn char_to_points(char: Char) -> Int {
-  case char {
-    "a" -> 0
-    "b" -> 0
-    "c" -> 0
-    "d" -> 0
-    _ -> 0
+pub fn parse_rack(chars: String, num_blanks: Int) -> Result(Rack, String) {
+  case string.byte_size(chars), is_alphanum(chars) {
+    size, True if size > 7 -> Error("rack has too many chars")
+    _, True -> {
+      let chars = string.to_graphemes(chars) |> list.sort(string.compare)
+      Ok(Rack(chars, num_blanks))
+    }
+    _, False -> Error("rack has unidentifiable letters")
   }
 }
 
-pub fn is_alphanum(codepoint: UtfCodepoint) -> Bool {
-  let int = string.utf_codepoint_to_int(codepoint)
-  case int {
-    49 | 50 | 51 | 52 | 95 -> True
-    x if 65 <= x && x <= 90 -> True
-    x if 97 <= x && x <= 122 -> True
-    _ -> False
+pub fn char_to_points(char: Char) -> Int {
+  case char {
+    "E" | "A" | "I" | "O" | "N" | "R" | "T" | "L" | "S" | "U" -> 1
+    "D" | "G" -> 2
+    "B" | "C" | "M" | "P" -> 3
+    "F" | "H" | "V" | "W" | "Y" -> 4
+    "K" -> 5
+    "J" | "X" -> 8
+    "Q" | "Z" -> 10
+    "e"
+    | "a"
+    | "i"
+    | "o"
+    | "n"
+    | "r"
+    | "t"
+    | "l"
+    | "s"
+    | "u"
+    | "d"
+    | "g"
+    | "b"
+    | "c"
+    | "m"
+    | "p"
+    | "f"
+    | "h"
+    | "v"
+    | "w"
+    | "y"
+    | "k"
+    | "j"
+    | "x"
+    | "q"
+    | "z" -> 0
+    _ -> panic as "unrecognized character"
   }
+}
+
+pub fn is_alphanum(word: String) -> Bool {
+  word
+  |> string.to_utf_codepoints
+  |> list.all(fn(codepoint) {
+    let int = string.utf_codepoint_to_int(codepoint)
+    case int {
+      49 | 50 | 51 | 52 | 95 -> True
+      x if 65 <= x && x <= 90 -> True
+      x if 97 <= x && x <= 122 -> True
+      _ -> False
+    }
+  })
 }
 
 pub fn parse_board(board: String) -> Result(Board, String) {
   // Okay, we need to be able to input a board with a blank, maybe a regular
   // letter is lowercase while a blank is uppercase??
 
-  let codepoints = string.to_utf_codepoints(board)
-
-  case string.byte_size(board), list.all(codepoints, is_alphanum) {
+  case string.byte_size(board), is_alphanum(board) {
     _, False -> Error("board must be a-z, A-Z, 1-4, or _")
     225, True -> {
       let board =

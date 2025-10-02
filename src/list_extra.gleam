@@ -3,7 +3,7 @@ import gleam/list
 import gleam/order.{type Order, Eq, Gt, Lt}
 import gleam/pair
 
-// MODIFIED FROM GLEAM/LIST TO INCLUDE VALUE TRANSFORM
+/// note: modified from gleam/list to include value transform
 pub fn group(
   list: List(v),
   by key: fn(v) -> k,
@@ -32,6 +32,7 @@ pub fn group_inner(
   }
 }
 
+/// note: does not preserve order
 pub fn append(first: List(a), second: List(a)) -> List(a) {
   case first {
     [] -> second
@@ -39,6 +40,7 @@ pub fn append(first: List(a), second: List(a)) -> List(a) {
   }
 }
 
+/// note: does not preserve order
 pub fn filter(list: List(a), keeping predicate: fn(a) -> Bool) -> List(a) {
   list.fold(list, [], fn(acc, a) {
     case predicate(a) {
@@ -48,22 +50,7 @@ pub fn filter(list: List(a), keeping predicate: fn(a) -> Bool) -> List(a) {
   })
 }
 
-pub fn fusion_new(list: List(a)) -> #(List(a), List(fn(a) -> Bool)) {
-  pair.new(list, [])
-}
-
-pub fn fusion_filter(
-  tup: #(List(a), List(fn(a) -> Bool)),
-  pred: fn(a) -> Bool,
-) -> #(List(a), List(fn(a) -> Bool)) {
-  pair.map_second(tup, list.prepend(_, pred))
-}
-
-pub fn fusion_eval(tup: #(List(a), List(fn(a) -> Bool))) -> List(a) {
-  let #(list, preds) = tup
-  filter(list, fn(a) { list.all(preds, fn(pred) { pred(a) }) })
-}
-
+/// note: does not preserve order
 pub fn exclude(list: List(a), excluding predicate: fn(a) -> Bool) -> List(a) {
   list.fold(list, [], fn(acc, a) {
     case predicate(a) {
@@ -73,22 +60,28 @@ pub fn exclude(list: List(a), excluding predicate: fn(a) -> Bool) -> List(a) {
   })
 }
 
+/// note: does not preserve order
 pub fn map(list: List(a), with fun: fn(a) -> b) -> List(b) {
   list.fold(list, [], fn(acc, a) { [fun(a), ..acc] })
 }
 
+/// produces every pair between 2 lists as a 2-tuple
 pub fn pairs(xs: List(a), ys: List(b)) -> List(#(a, b)) {
-  list.flat_map(xs, fn(x) { list.map(ys, fn(y) { #(x, y) }) })
+  list.flat_map(xs, fn(x) { map(ys, fn(y) { #(x, y) }) })
 }
 
+/// produces every pair between 2 lists as a 2-tuple applied to function
 pub fn pairs_by(xs: List(a), ys: List(b), fxn: fn(a, b) -> c) -> List(c) {
-  list.flat_map(xs, fn(x) { list.map(ys, fn(y) { fxn(x, y) }) })
+  list.flat_map(xs, fn(x) { map(ys, fn(y) { fxn(x, y) }) })
 }
 
+/// applies multiple predicates to a list in 1 pass
+/// note: does not preserve order
 pub fn filter_all(xs: List(a), predicates: List(fn(a) -> Bool)) -> List(a) {
   filter(xs, fn(x) { list.all(predicates, fn(fxn) { fxn(x) }) })
 }
 
+/// predicate testing whether list is already sorted
 pub fn is_sorted(xs: List(a), cmp: fn(a, a) -> Order) -> Bool {
   case xs {
     [] -> True
