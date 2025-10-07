@@ -4,8 +4,8 @@ import gleam/option.{None, Some}
 import gleam/string
 
 import types.{
-  type Board, type Bonus, type Char, type Rack, Cell, DoubleLetterScore,
-  DoubleWordScore, Rack, Square, Tile, TripleLetterScore, TripleWordScore,
+  type Board, type Char, type Rack, Cell, DoubleLetterScore, DoubleWordScore,
+  Rack, Square, Tile, TripleLetterScore, TripleWordScore,
 }
 
 pub fn init() -> Board {
@@ -56,6 +56,7 @@ pub fn char_to_points(char: Char) -> Int {
     "K" -> 5
     "J" | "X" -> 8
     "Q" | "Z" -> 10
+    // lowercase letters are for blanks
     "e"
     | "a"
     | "i"
@@ -86,6 +87,7 @@ pub fn char_to_points(char: Char) -> Int {
   }
 }
 
+/// are all chars in word a-z, A-Z, 0-9, or _?
 pub fn is_alphanum(word: String) -> Bool {
   word
   |> string.to_utf_codepoints
@@ -101,9 +103,6 @@ pub fn is_alphanum(word: String) -> Bool {
 }
 
 pub fn parse_board(board: String) -> Result(Board, String) {
-  // Okay, we need to be able to input a board with a blank, maybe a regular
-  // letter is lowercase while a blank is uppercase??
-
   case string.byte_size(board), is_alphanum(board) {
     _, False -> Error("board must be a-z, A-Z, 1-4, or _")
     225, True -> {

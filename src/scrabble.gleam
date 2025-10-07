@@ -1,8 +1,8 @@
 import board
 import gleam/dict
 import gleam/function
-import gleam/list
-import gleam/option.{None, Some}
+import gleam/list.{Continue, Stop}
+import gleam/option.{type Option, None, Some}
 import gleam/pair
 import gleam/result
 import gleam/set.{type Set}
@@ -44,10 +44,10 @@ pub fn calculate_plays(
       |> list_extra.filter(rack_compatible(rack, cloze, _))
     list_extra.append(list_extra.pairs(words, playspots), acc)
   })
-  |> list_extra.filter(legal_cross_words(_, board, dictionary))
-  |> list_extra.map(score(_, board, dictionary))
+  |> list.filter_map(score(_, board, dictionary))
 }
 
+/// wrapper for can_rack_play_word
 fn rack_compatible(rack: Rack, cloze: Cloze, word: String) -> Bool {
   let chars =
     case string.to_graphemes(word) |> list.strict_zip(cloze, _) {
@@ -68,7 +68,7 @@ fn rack_compatible(rack: Rack, cloze: Cloze, word: String) -> Bool {
 
 /// does the rack have the necessary tiles to play the word?
 /// simliar to `are chars subset of rack?` but also handles blanks
-pub fn can_rack_play_word(rack: Rack, chars: List(Char)) -> Bool {
+fn can_rack_play_word(rack: Rack, chars: List(Char)) -> Bool {
   case rack, chars {
     _, [] -> True
     Rack([h1, ..t1], blanks), [h2, ..t2] if h1 == h2 ->
@@ -79,7 +79,7 @@ pub fn can_rack_play_word(rack: Rack, chars: List(Char)) -> Bool {
   }
 }
 
-// cloze length, index of first known letter, letter List(String) // word list
+/// cloze length, index of first known letter, letter List(String) // word list
 pub fn build_cloze_dictionary(words: List(String)) -> Dictionary {
   Dictionary(
     list.fold(words, dict.new(), fn(acc, word) {
@@ -93,6 +93,7 @@ pub fn build_cloze_dictionary(words: List(String)) -> Dictionary {
   )
 }
 
+/// finds all cells corresponding to empty squares that are immediately orthogonal to squares with tiles
 fn build_adjacent_cells(board: Board) -> Set(Cell) {
   dict.keys(board)
   |> list.flat_map(fn(cell) {
@@ -104,6 +105,8 @@ fn build_adjacent_cells(board: Board) -> Set(Cell) {
   |> set.from_list
 }
 
+/// produces every single legal place to play a word. does not check against
+/// dictionary.
 fn all_playspots(board: Board, rack: Rack) -> List(Playspot) {
   let shortest_word = 2
   let longest_word = 15
@@ -152,7 +155,7 @@ fn transpose_cell(cell: Cell) -> Cell {
 /// confirms that the letter before and after playspot is either empty or off the board.
 fn is_not_subword(board: Board, playspot: Playspot) -> Bool {
   case list.first(playspot), list.last(playspot) {
-    Ok(Cell(x1, y1) as cell1), Ok(Cell(x2, y2) as cell2) ->
+    Ok(Cell(x1, y1)), Ok(Cell(x2, y2)) ->
       case x1 < x2, y1 < y2 {
         True, False -> [Cell(x1 - 1, y1), Cell(x2 + 1, y2)]
         False, True -> [Cell(x1, y1 - 1), Cell(x2, y2 + 2)]
@@ -219,22 +222,45 @@ fn cloze_words(cloze: Cloze, dictionary: Dictionary) -> List(String) {
   })
 }
 
-/// filter predicate that disqualifies words based on the validity of cross-axis words
-fn legal_cross_words(
-  word_playspot: #(String, Playspot),
-  board: Board,
-  dictionary: Dictionary,
-) -> Bool {
-  todo
-}
+//fn legal_cross_words(
+//word_playspot: #(String, Playspot),
+//board: Board,
+//dictionary: Dictionary,
+//) -> Result(#(String, Playspot, Int), Nil) {
+//todo
+//}
 
-/// assumes word is valid and scores it according to scrabble scoring rules,
+/// scores it according to scrabble scoring rules
 /// taking into account bonuses, cross-axis words, and bingos
+/// disqualifies words based on the validity of cross-axis words
 fn score(
   word_playspot: #(String, Playspot),
   board: Board,
   dictionary: Dictionary,
-) -> #(String, Playspot, Int) {
-  let #(word, playspot) = word_playspot
-  todo
+) -> Result(#(String, Playspot, Int), Nil) {
+  let assert #(word, [Cell(x1, y1), Cell(x2, y2), ..] as playspot) =
+    word_playspot
+  let dx = y2 - y1
+  let dy = x2 - x1
+
+  string.to_graphemes(word)
+  |> list.zip(playspot)
+  |> list.fold(Some(0), fn(acc, tup) {
+    option.then(acc, cross_word(tup, dx, dy, board, dictionary))
+  })
+  |> option.map(fn(total) { #(word, playspot, total) })
+  |> option.to_result(Nil)
+}
+
+fn cross_word(
+  tup: #(Char, Cell),
+  dx: Int,
+  dy: Int,
+  board: Board,
+  dict: Dictionary,
+) -> fn(Int) -> Option(Int) {
+  fn(total) {
+    let #(char, Cell(x, y)) = tup
+    Some(0)
+  }
 }
