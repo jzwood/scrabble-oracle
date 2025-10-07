@@ -1,6 +1,7 @@
 import board
 import gleam/dict
 import gleam/function
+import gleam/int
 import gleam/list.{Continue, Stop}
 import gleam/option.{type Option, None, Some}
 import gleam/pair
@@ -11,7 +12,8 @@ import list_extra
 import types.{
   type Board, type Bonus, type Cell, type Char, type Cloze, type ClozeKey,
   type Dictionary, type Playspot, type Rack, type Square, type Tile, Cell,
-  DefaultKey, Dictionary, Key, Rack, Square, Tile,
+  DefaultKey, Dictionary, DoubleLetterScore, DoubleWordScore, Key, Rack, Square,
+  Tile, TripleLetterScore, TripleWordScore,
 }
 
 const board_size = 15
@@ -222,14 +224,6 @@ fn cloze_words(cloze: Cloze, dictionary: Dictionary) -> List(String) {
   })
 }
 
-//fn legal_cross_words(
-//word_playspot: #(String, Playspot),
-//board: Board,
-//dictionary: Dictionary,
-//) -> Result(#(String, Playspot, Int), Nil) {
-//todo
-//}
-
 /// scores it according to scrabble scoring rules
 /// taking into account bonuses, cross-axis words, and bingos
 /// disqualifies words based on the validity of cross-axis words
@@ -243,24 +237,53 @@ fn score(
   let dx = y2 - y1
   let dy = x2 - x1
 
-  string.to_graphemes(word)
-  |> list.zip(playspot)
-  |> list.fold(Some(0), fn(acc, tup) {
-    option.then(acc, cross_word(tup, dx, dy, board, dictionary))
+  let placement =
+    string.to_graphemes(word)
+    |> list.zip(playspot)
+
+  list.fold(placement, Some(0), fn(acc, tup) {
+    let #(_char, Cell(x, y)) = tup
+    option.then(acc, fn(total) {
+      cross_word(x, y, dx, dy, board, dictionary)
+      |> option.map(int.add(_, total))
+    })
   })
-  |> option.map(fn(total) { #(word, playspot, total) })
+  |> option.map(fn(total) {
+    let points = score_word(placement, board)
+    #(word, playspot, total + points)
+  })
   |> option.to_result(Nil)
 }
 
 fn cross_word(
-  tup: #(Char, Cell),
+  x: Int,
+  y: Int,
   dx: Int,
   dy: Int,
   board: Board,
   dict: Dictionary,
-) -> fn(Int) -> Option(Int) {
-  fn(total) {
-    let #(char, Cell(x, y)) = tup
-    Some(0)
-  }
+) -> Option(Int) {
+  todo
+}
+
+fn score_word(word: List(#(Char, Cell)), board: Board) -> Int {
+  let #(total, multiplier) =
+    list.fold(word, #(0, 1), fn(total_bonus, char_cell) {
+      let #(total, multiplier) = total_bonus
+      let #(char, cell) = char_cell
+      let points = board.char_to_points(char)
+      case dict.get(board, cell) {
+        Error(Nil) -> panic as "every cell of board must have square"
+        Ok(Square(None, None)) -> #(points, multiplier)
+        Ok(Square(None, Some(bonus))) ->
+          case bonus {
+            DoubleLetterScore -> #(total + { points * 2 }, multiplier)
+            DoubleWordScore -> #(total + points, 2 * multiplier)
+            TripleLetterScore -> #(total + { points * 3 }, multiplier)
+            TripleWordScore -> #(total + points, 3 * multiplier)
+          }
+        Ok(Square(Some(Tile(_, points)), _)) -> #(total + points, multiplier)
+      }
+    })
+  total * multiplier
 }
