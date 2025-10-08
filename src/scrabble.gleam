@@ -244,8 +244,12 @@ fn score(
   list.fold(placement, Some(0), fn(acc, tup) {
     let #(_char, Cell(x, y)) = tup
     option.then(acc, fn(total) {
-      cross_word(x, y, dx, dy, board, dictionary)
-      |> option.map(int.add(_, total))
+      cross_words(x, y, dx, dy, board, dictionary)
+      |> option.map(fn(words) {
+        list_extra.map(words, score_word(_, board))
+        |> int.sum
+        |> int.add(total)
+      })
     })
   })
   |> option.map(fn(total) {
@@ -255,14 +259,14 @@ fn score(
   |> option.to_result(Nil)
 }
 
-fn cross_word(
+fn cross_words(
   x: Int,
   y: Int,
   dx: Int,
   dy: Int,
   board: Board,
   dict: Dictionary,
-) -> Option(Int) {
+) -> Option(List(List(#(Char, Cell)))) {
   todo
 }
 
