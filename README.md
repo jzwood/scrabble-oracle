@@ -27,8 +27,8 @@
        played word?
      - is the playspot not a subword? ie the square before first letter and
        after last letter empty?
-3. pair each of these with their corresponding cloze on the board
-   - `#(playspot, "A_")`
+3. pair every playspot with their corresponding cloze on the board
+   - `#(playspot, cloze)`
 4. group these pairings by cloze
    - now each cloze will be associated with 1+ playspots
    - `dict(cloze, list(playspot))`
