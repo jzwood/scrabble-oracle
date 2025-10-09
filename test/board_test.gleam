@@ -1,5 +1,6 @@
 import board
 import gleam/dict
+import gleam/list
 import gleeunit
 
 pub fn main() -> Nil {

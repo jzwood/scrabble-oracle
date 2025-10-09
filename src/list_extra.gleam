@@ -50,16 +50,6 @@ pub fn filter(list: List(a), keeping predicate: fn(a) -> Bool) -> List(a) {
 }
 
 /// note: does not preserve order
-pub fn exclude(list: List(a), excluding predicate: fn(a) -> Bool) -> List(a) {
-  list.fold(list, [], fn(acc, a) {
-    case predicate(a) {
-      True -> acc
-      False -> [a, ..acc]
-    }
-  })
-}
-
-/// note: does not preserve order
 pub fn map(list: List(a), with fun: fn(a) -> b) -> List(b) {
   list.fold(list, [], fn(acc, a) { [fun(a), ..acc] })
 }
