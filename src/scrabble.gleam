@@ -2,18 +2,17 @@ import board
 import gleam/dict
 import gleam/function
 import gleam/int
-import gleam/list.{Continue, Stop}
-import gleam/option.{type Option, None, Some}
+import gleam/list
+import gleam/option.{None, Some}
 import gleam/pair
 import gleam/result
 import gleam/set.{type Set}
 import gleam/string
 import list_extra
 import types.{
-  type Board, type Bonus, type Cell, type Char, type Cloze, type ClozeKey,
-  type Dictionary, type Playspot, type Rack, type Square, type Tile, Cell,
-  DefaultKey, Dictionary, DoubleLetterScore, DoubleWordScore, Key, Rack, Square,
-  Tile, TripleLetterScore, TripleWordScore,
+  type Board, type Cell, type Char, type Cloze, type Dictionary, type Playspot,
+  type Rack, Cell, DefaultKey, Dictionary, DoubleLetterScore, DoubleWordScore,
+  Key, Rack, Square, Tile, TripleLetterScore, TripleWordScore,
 }
 
 const board_size = 15
@@ -226,7 +225,8 @@ fn cloze_words(cloze: Cloze, dictionary: Dictionary) -> List(String) {
 
 /// scores it according to scrabble scoring rules
 /// taking into account bonuses, cross-axis words, and bingos
-/// disqualifies words based on the validity of cross-axis words
+/// by construction, expects the main-axis word to be dictionary legal;
+/// however, will disqualify words based on legality of cross-axis words
 fn score(
   word_playspot: #(String, Playspot),
   board: Board,
@@ -234,22 +234,30 @@ fn score(
 ) -> Result(#(String, Playspot, Int), Nil) {
   let assert #(word, [Cell(x1, y1), Cell(x2, y2), ..] as playspot) =
     word_playspot
-  let dx = y2 - y1
-  let dy = x2 - x1
+  let xdx = int.absolute_value(y2 - y1)
+  let xdy = int.absolute_value(x2 - x1)
 
   let placement =
     string.to_graphemes(word)
     |> list.zip(playspot)
 
   list.fold(placement, Some(0), fn(acc, tup) {
-    let #(_char, Cell(x, y)) = tup
+    let #(char, cell) = tup
     option.then(acc, fn(total) {
-      cross_words(x, y, dx, dy, board, dictionary)
-      |> option.map(fn(words) {
-        list_extra.map(words, score_word(_, board))
-        |> int.sum
-        |> int.add(total)
-      })
+      case cross_word(char, cell, xdx, xdy, board) {
+        [] -> panic as "cross word cannot have length 0"
+        [_] -> Some(total)
+        // cross-axis words with 1 char mean no x-axis word was formed
+        word ->
+          case
+            list.map(word, pair.first)
+            |> string.concat
+            |> set.contains(dictionary.words, _)
+          {
+            True -> Some(score_word(word, board) + total)
+            False -> None
+          }
+      }
     })
   })
   |> option.map(fn(total) {
@@ -259,15 +267,43 @@ fn score(
   |> option.to_result(Nil)
 }
 
-fn cross_words(
-  x: Int,
-  y: Int,
+fn flood(
+  cell: Cell,
   dx: Int,
   dy: Int,
   board: Board,
-  dict: Dictionary,
-) -> Option(List(List(#(Char, Cell)))) {
-  todo
+  acc: List(#(Char, Cell)),
+) -> List(#(Char, Cell)) {
+  let Cell(x, y) = cell
+  let cell = Cell(x + dx, y + dy)
+  case dict.get(board, cell) {
+    Error(Nil) -> []
+    Ok(Square(None, _)) -> []
+    Ok(Square(Some(Tile(char, _)), _)) ->
+      flood(cell, dx, dy, board, [#(char, cell), ..acc])
+  }
+}
+
+/// returns cross-axis words, ie words longer than 1 character that are formed
+/// by playing the character at that cell
+fn cross_word(
+  char: Char,
+  cell: Cell,
+  xdx: Int,
+  xdy: Int,
+  board: Board,
+) -> List(#(Char, Cell)) {
+  case dict.get(board, cell) {
+    Error(Nil) -> panic as "cross_word cell must start on the board"
+    Ok(Square(Some(Tile(char, _)), _)) -> [#(char, cell)]
+    // tile already exists on board so you cannot score x-axis points
+    Ok(Square(None, _)) ->
+      list.flatten([
+        flood(cell, -xdx, -xdy, board, []),
+        [#(char, cell)],
+        flood(cell, xdx, xdy, board, []) |> list.reverse,
+      ])
+  }
 }
 
 fn score_word(word: List(#(Char, Cell)), board: Board) -> Int {

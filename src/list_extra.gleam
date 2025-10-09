@@ -1,7 +1,6 @@
 import gleam/dict.{type Dict}
 import gleam/list
 import gleam/order.{type Order, Eq, Gt, Lt}
-import gleam/pair
 
 /// note: modified from gleam/list to include value transform
 pub fn group(

@@ -1,5 +1,5 @@
 import gleam/dict.{type Dict}
-import gleam/option.{type Option, None, Some}
+import gleam/option.{type Option}
 import gleam/set.{type Set}
 
 pub type Char =
