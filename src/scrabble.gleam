@@ -306,6 +306,7 @@ fn cross_word(
   }
 }
 
+/// straightforwardly returns the score for the played word
 fn score_word(word: List(#(Char, Cell)), board: Board) -> Int {
   let #(total, multiplier) =
     list.fold(word, #(0, 1), fn(total_bonus, char_cell) {

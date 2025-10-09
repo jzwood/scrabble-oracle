@@ -83,7 +83,8 @@ pub fn char_to_points(char: Char) -> Int {
     | "x"
     | "q"
     | "z" -> 0
-    _ -> panic as "unrecognized character"
+    "1" | "2" | "3" | "4" -> 0
+    _ -> panic as { "unrecognized character \"" <> char <> "\"" }
   }
 }
 
@@ -109,7 +110,7 @@ pub fn parse_board(board: String) -> Result(Board, String) {
       let board =
         board
         |> string.to_graphemes
-        |> list.window(15)
+        |> list.sized_chunk(into: 15)
         |> list.index_map(fn(row, y) {
           row
           |> list.index_map(fn(cell, x) {
