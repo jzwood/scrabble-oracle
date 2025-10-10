@@ -88,16 +88,17 @@ pub fn char_to_points(char: Char) -> Int {
   }
 }
 
-/// are all chars in word a-z, A-Z, 0-9, or _?
+/// are all chars in word a-z, A-Z, 1-4, or _?
 pub fn is_alphanum(word: String) -> Bool {
   word
   |> string.to_utf_codepoints
   |> list.all(fn(codepoint) {
     let int = string.utf_codepoint_to_int(codepoint)
     case int {
-      49 | 50 | 51 | 52 | 95 -> True
       x if 65 <= x && x <= 90 -> True
       x if 97 <= x && x <= 122 -> True
+      49 | 50 | 51 | 52 -> True
+      95 -> True
       _ -> False
     }
   })

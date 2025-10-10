@@ -52,6 +52,11 @@ pub fn filter_all_test() {
     ])
     |> list.sort(int.compare)
     == [19, 21]
+  assert list_extra.filter_all(a, [
+      int.is_odd,
+      int.is_even,
+    ])
+    == []
 }
 
 pub fn group_test() {
