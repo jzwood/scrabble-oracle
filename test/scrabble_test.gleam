@@ -4,6 +4,26 @@ pub fn main() -> Nil {
   gleeunit.main()
 }
 
+const board = [
+  "4__B___N___1__4",
+  "JOULES_A___QAT_",
+  "OY2E_T1R1___B__",
+  "1__E_A_CONE2O_1",
+  "_RUDER___ADORN_",
+  "_3___L_PIG__T3_",
+  "_V1__I1U1___I__",
+  "MILLINER___1OOF",
+  "_V1__G1G1___NO_",
+  "_A___3_E_3___Z_",
+  "___NEXUS__2__E_",
+  "1_MAT__1___2_D_",
+  "__E___1_1___2__",
+  "_2W__3___3___2_",
+  "WAS1___4___1__4",
+]
+
+const rack = "FEASTTH"
+
 // gleeunit test functions end in `_test`
 pub fn hello_world_test() {
   let name = "Joe"

@@ -308,23 +308,35 @@ fn cross_word(
 
 /// straightforwardly returns the score for the played word
 fn score_word(word: List(#(Char, Cell)), board: Board) -> Int {
-  let #(total, multiplier) =
-    list.fold(word, #(0, 1), fn(total_bonus, char_cell) {
-      let #(total, multiplier) = total_bonus
+  let #(total, multiplier, tiles) =
+    list.fold(word, #(0, 1, 0), fn(total_bonus, char_cell) {
+      let #(total, multiplier, tiles) = total_bonus
       let #(char, cell) = char_cell
       let points = board.char_to_points(char)
       case dict.get(board, cell) {
         Error(Nil) -> panic as "every cell of board must have square"
-        Ok(Square(None, None)) -> #(points, multiplier)
+        Ok(Square(None, None)) -> #(points, multiplier, tiles + 1)
         Ok(Square(None, Some(bonus))) ->
           case bonus {
-            DoubleLetterScore -> #(total + { points * 2 }, multiplier)
-            DoubleWordScore -> #(total + points, 2 * multiplier)
-            TripleLetterScore -> #(total + { points * 3 }, multiplier)
-            TripleWordScore -> #(total + points, 3 * multiplier)
+            DoubleLetterScore -> #(points * 2 + total, multiplier, tiles + 1)
+            DoubleWordScore -> #(points + total, 2 * multiplier, tiles + 1)
+            TripleLetterScore -> #(points * 3 + total, multiplier, tiles + 1)
+            TripleWordScore -> #(points + total, 3 * multiplier, tiles + 1)
           }
-        Ok(Square(Some(Tile(_, points)), _)) -> #(total + points, multiplier)
+        Ok(Square(Some(Tile(_, points)), _)) -> #(
+          total + points,
+          multiplier,
+          tiles,
+        )
       }
     })
-  total * multiplier
+
+  total
+  * multiplier
+  + {
+    case tiles {
+      7 -> 50
+      _ -> 0
+    }
+  }
 }
