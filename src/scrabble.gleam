@@ -9,6 +9,7 @@ import gleam/result
 import gleam/set.{type Set}
 import gleam/string
 import list_extra
+import simplifile.{type FileError, read}
 import types.{
   type Board, type Cell, type Char, type Cloze, type Dictionary, type Playspot,
   type Rack, Cell, DefaultKey, Dictionary, DoubleLetterScore, DoubleWordScore,
@@ -29,6 +30,16 @@ pub fn main(
     Error(err), _ -> Error(err)
     _, Error(err) -> Error(err)
   }
+}
+
+pub fn precompute_dictionary(
+  words_path: String,
+) -> Result(Dictionary, FileError) {
+  read(words_path)
+  |> result.map(fn(words) {
+    string.split(words, "\n")
+    |> build_cloze_dictionary
+  })
 }
 
 pub fn calculate_plays(
@@ -156,11 +167,17 @@ fn transpose_cell(cell: Cell) -> Cell {
 /// confirms that the letter before and after playspot is either empty or off the board.
 fn is_not_subword(board: Board, playspot: Playspot) -> Bool {
   case list.first(playspot), list.last(playspot) {
-    Ok(Cell(x1, y1)), Ok(Cell(x2, y2)) ->
+    Ok(Cell(x1, y1) as c1), Ok(Cell(x2, y2) as c2) ->
       case x1 < x2, y1 < y2 {
         True, False -> [Cell(x1 - 1, y1), Cell(x2 + 1, y2)]
         False, True -> [Cell(x1, y1 - 1), Cell(x2, y2 + 2)]
-        _, _ -> panic as "playspots must have 1 and only 1 axis"
+        _, _ ->
+          panic as {
+              "playspots must have 1 and only 1 axis. found "
+              <> string.inspect(c1)
+              <> " "
+              <> string.inspect(c2)
+            }
       }
     _, _ -> panic as "impossible zero length playspot"
   }

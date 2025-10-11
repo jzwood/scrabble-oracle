@@ -27,9 +27,6 @@ pub fn init() -> Board {
     _2___3___3___2_
     4__1___4___1__4
     "
-    |> string.replace(" ", "")
-    |> string.replace("\n", "")
-    |> string.trim
 
   let assert Ok(board) = parse_board(board)
 
@@ -105,6 +102,12 @@ pub fn is_alphanum(word: String) -> Bool {
 }
 
 pub fn parse_board(board: String) -> Result(Board, String) {
+  let board =
+    board
+    |> string.replace(" ", "")
+    |> string.replace("\n", "")
+    |> string.trim
+
   case string.byte_size(board), is_alphanum(board) {
     _, False -> Error("board must be a-z, A-Z, 1-4, or _")
     225, True -> {
