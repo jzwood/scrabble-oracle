@@ -2,6 +2,7 @@ import board
 import gleam/dict
 import gleam/function
 import gleam/int
+import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
 import gleam/pair
@@ -57,9 +58,17 @@ pub fn calculate_plays(
     list_extra.append(list_extra.pairs(words, playspots), acc)
   })
   |> list.filter_map(score(_, board, dictionary))
+  |> list.sort(fn(a, b) {
+    let #(_, _, a) = a
+    let #(_, _, b) = b
+    int.compare(b, a)
+  })
 }
 
 /// wrapper for can_rack_play_word
+/// FAILURE MODE
+/// the word is not guarenteed to match cloze -- only that it might match. we
+/// only know that at least 1 letter matches!!!!!!!!!
 fn rack_compatible(rack: Rack, cloze: Cloze, word: String) -> Bool {
   let chars =
     case string.to_graphemes(word) |> list.strict_zip(cloze, _) {
@@ -75,7 +84,16 @@ fn rack_compatible(rack: Rack, cloze: Cloze, word: String) -> Bool {
     |> list.sort(string.compare)
   let assert True = list_extra.is_sorted(rack.chars, string.compare)
   let assert True = list_extra.is_sorted(chars, string.compare)
-  can_rack_play_word(rack, chars)
+  case word, can_rack_play_word(rack, chars) {
+    "AARDWOLVES", True -> {
+      io.println(string.inspect(rack))
+      io.println(word)
+      io.println(string.inspect(cloze))
+      io.println("----------")
+      True
+    }
+    _, can -> can
+  }
 }
 
 /// does the rack have the necessary tiles to play the word?
@@ -168,7 +186,7 @@ fn transpose_cell(cell: Cell) -> Cell {
 fn is_not_subword(board: Board, playspot: Playspot) -> Bool {
   case list.first(playspot), list.last(playspot) {
     Ok(Cell(x1, y1) as c1), Ok(Cell(x2, y2) as c2) ->
-      case x1 < x2, y1 < y2 {
+      case x1 != x2, y1 != y2 {
         True, False -> [Cell(x1 - 1, y1), Cell(x2 + 1, y2)]
         False, True -> [Cell(x1, y1 - 1), Cell(x2, y2 + 2)]
         _, _ ->

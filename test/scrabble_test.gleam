@@ -9,7 +9,8 @@ pub fn main() -> Nil {
   gleeunit.main()
 }
 
-const words_path = "./assets/word_list.txt"
+//const words_path = "./assets/word_list.txt"
+const words_path = "./assets/test_words.txt"
 
 const board = "
   4__B___N___1__4
@@ -42,5 +43,10 @@ pub fn main_test() {
     string.split(words, "\n")
     |> scrabble.build_cloze_dictionary
   io.println("building dictionary: done")
-  //scrabble.main(rack, 0, board, dict)
+
+  let assert Ok(words) = scrabble.main(rack, 0, board, dict)
+
+  words
+  |> string.inspect
+  |> io.println
 }
