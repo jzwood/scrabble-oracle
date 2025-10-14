@@ -16,7 +16,7 @@ function insert(trie, word) {
   if (!trie[char]) {
     trie[char] = {};
   }
-  //trie[char].end ||= terminal
+  trie[char].z ||= 1
   insert(trie[char], tail);
 }
 

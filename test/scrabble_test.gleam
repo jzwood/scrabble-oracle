@@ -3,14 +3,17 @@ import gleam/list
 import gleam/string
 import gleeunit
 import scrabble
-import simplifile.{read}
+import simplifile.{read, write}
+import trie
 
 pub fn main() -> Nil {
   gleeunit.main()
 }
 
-//const words_path = "./assets/word_list.txt"
-const words_path = "./assets/test_words.txt"
+const words_path = "./assets/word_list.txt"
+
+//const words_path = "./assets/test_words.txt"
+const trie_dest = "./assets/trie.gleam"
 
 const board = "
   4__B___N___1__4
@@ -41,12 +44,15 @@ pub fn main_test() {
   io.println("building dictionary: ongoing")
   let dict =
     string.split(words, "\n")
-    |> scrabble.build_cloze_dictionary
+    |> trie.build_dictionary()
+  //|> scrabble.build_cloze_dictionary
   io.println("building dictionary: done")
 
-  let assert Ok(words) = scrabble.main(rack, 0, board, dict)
+  string.inspect(dict)
+  |> write(trie_dest, _)
+  //let assert Ok(words) = scrabble.main(rack, 0, board, dict)
 
-  words
-  |> string.inspect
-  |> io.println
+  //words
+  //|> string.inspect
+  //|> io.println
 }
