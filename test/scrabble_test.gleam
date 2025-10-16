@@ -47,9 +47,8 @@ pub fn main_test() {
     |> trie.build_dictionary()
   //|> scrabble.build_cloze_dictionary
   io.println("building dictionary: done")
-
-  string.inspect(dict)
-  |> write(trie_dest, _)
+  //string.inspect(dict)
+  //|> write(trie_dest, _)
   //let assert Ok(words) = scrabble.main(rack, 0, board, dict)
 
   //words

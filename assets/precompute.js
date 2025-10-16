@@ -16,8 +16,8 @@ function insert(trie, word) {
   if (!trie[char]) {
     trie[char] = {};
   }
-  trie[char].z ||= 1
+  trie[char].terminal ||= terminal
   insert(trie[char], tail);
 }
 
-await Deno.writeTextFile("words.json", JSON.stringify(trie), { encoding: "utf8" });
+await Deno.writeTextFile("assets/words.json", JSON.stringify(trie), { encoding: "utf8" });
