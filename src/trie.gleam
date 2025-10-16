@@ -16,9 +16,8 @@ pub type Dictionary {
   Dictionary(forward: Trie, backward: Trie)
 }
 
-// Assuming this comes from a JavaScript interop call
-@external(javascript, "./fast_trie.mjs", "build")
-pub fn fast_trie(words: String) -> Dynamic
+@external(javascript, "./unsafe_trie.mjs", "build")
+pub fn unsafe_build_trie(words: String) -> Dynamic
 
 pub fn decode_trie() -> decode.Decoder(Trie) {
   use <- decode.recursive
@@ -35,37 +34,43 @@ pub fn empty() -> Trie {
 }
 
 pub fn build(words: String) -> Trie {
-  let dynamic_trie = fast_trie(words)
-  case decode.run(dynamic_trie, decode_trie()) {
+  case decode.run(unsafe_build_trie(words), decode_trie()) {
     Ok(trie) -> {
-      io.println("SUCCESS")
       trie
     }
     Error(reasons) -> {
       let errors = reasons |> string.inspect
-      io.println(errors)
       panic as errors
     }
   }
 }
 
-pub fn build_dictionary(words: List(String)) -> Dictionary {
-  list.fold(words, Dictionary(empty(), empty()), fn(acc, word) {
-    let Dictionary(forward, backward) = acc
-    let chars = string.to_graphemes(word)
-    let forward = insert(forward, chars)
-    let backward =
-      list.scan(chars, [], list.prepend) |> list.fold(backward, insert)
-    Dictionary(forward, backward)
-  })
-}
-
-//pub fn build_dictionary(words: List(String)) -> Trie {
-//list.fold(words, empty(), fn(trie, word) {
+//pub fn build_dictionary(words: List(String)) -> Dictionary {
+//list.fold(words, Dictionary(empty(), empty()), fn(acc, word) {
+//let Dictionary(forward, backward) = acc
 //let chars = string.to_graphemes(word)
-//list.scan(chars, [], list.prepend) |> list.fold(trie, insert)
+//let forward = insert(forward, chars)
+//let backward =
+//list.scan(chars, [], list.prepend) |> list.fold(backward, insert)
+//Dictionary(forward, backward)
 //})
 //}
+
+pub fn build_dictionary(words: String) -> Dictionary {
+  let forward = build(words)
+
+  let backward =
+    string.split(words, "\n")
+    |> list.flat_map(fn(word) {
+      string.to_graphemes(word)
+      |> list.scan([], list.prepend)
+      |> list.map(string.join(_, ""))
+    })
+    |> string.join("\n")
+    |> build
+
+  Dictionary(forward, backward)
+}
 
 pub fn insert_old(trie: Trie, word: List(Char)) -> Trie {
   case word {

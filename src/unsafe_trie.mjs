@@ -5,7 +5,6 @@ export function build(words) {
     .forEach((word) => {
       insert(trie, Array.from(word));
     });
-  console.log("TRIE", trie);
   return trie;
 }
 
