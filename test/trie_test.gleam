@@ -16,8 +16,11 @@ const words_path = "./assets/word_list.txt"
 const trie_dest = "./assets/trie.gleam"
 
 pub fn main_test() {
-  io.println("reading words: ongoing")
   let assert Ok(words) = read(from: words_path)
-  io.println("reading words: done")
-  let dict = trie.build(words)
+  io.println("building dictionary")
+  //let dict = trie.build_dictionary(words)
+  //io.println("SUCCESS")
+  trie.build_dictionary(words)
+  |> string.inspect()
+  |> io.println()
 }

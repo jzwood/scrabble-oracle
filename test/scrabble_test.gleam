@@ -37,9 +37,10 @@ const rack = "FEASTTH"
 
 // gleeunit test functions end in `_test`
 pub fn main_test_ignore() {
-  io.println("reading words: ongoing")
-  let assert Ok(words) = read(from: words_path)
-  io.println("reading words: done")
+  io.println("YOU SHOULD NOT BE SEEING THIS")
+  //io.println("reading words: ongoing")
+  //let assert Ok(words) = read(from: words_path)
+  //io.println("reading words: done")
 
   io.println("building dictionary: ongoing")
   //let dict =
