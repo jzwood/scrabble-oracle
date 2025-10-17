@@ -3,6 +3,7 @@ import gleam/dynamic.{type Dynamic}
 import gleam/dynamic/decode.{type Decoder}
 import gleam/list
 import gleam/option.{None, Some}
+import gleam/result
 import gleam/string
 import list_extra
 import types.{type Char, type Cloze, type Rack, Rack}
@@ -65,16 +66,17 @@ pub fn walk_up(trie: Trie, cloze: Cloze, rack: Rack) -> List(String) {
 // THINK ABOUT HOW TO MAKE THIS MORE GENERIC SUCH THAT WALK_UP AND IS_MEMBER
 // COULD BOTH BE IMPLEMENTED WITH IT. CRITICALLY, WE CARE ABOUT WHETHER TRIE IS
 // LEAF NODE, AKA dict.size(trie.children) == 0
+// HMMM IS THAT TRUE???
 pub fn explore(
   trie: Trie,
   cloze: Cloze,
   rack: Rack,
   trail: List(Char),
-) -> List(List(Char)) {
+) -> List(String) {
   case cloze {
     [] ->
       case trie.terminal {
-        True -> [trail]
+        True -> [list.reverse(trail) |> string.concat()]
         False -> []
       }
     [Ok(char), ..cloze] ->
@@ -108,6 +110,15 @@ pub fn explore(
       })
   }
 }
+
+pub fn dig(trie: Trie, path: String) -> Result(Trie, Nil) {
+  case string.pop_grapheme(path) {
+    Error(Nil) -> Ok(trie)
+    Ok(#(char, path)) ->
+      dict.get(trie.children, char)
+      |> result.try(dig(_, path))
+  }
+}
 // compare trie.children keys against first char
 
 // CLOZE: ___A_B__C
@@ -115,3 +126,4 @@ pub fn explore(
 // rack: ABCD
 // trie: {x, y, z}
 //
+// explore: Trie, word -> true
