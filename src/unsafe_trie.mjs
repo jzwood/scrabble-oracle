@@ -8,14 +8,14 @@ export function buildDictionary(words) {
   words
     .split("\n")
     .forEach((word) => {
-      const chars = Array.from(word)
+      const chars = Array.from(word);
       insert(forward, chars);
       chars.reverse();
       do {
         insert(backward, chars);
       } while (chars.pop());
     });
-  return {forward, backward}
+  return { forward, backward };
 }
 
 function insert(trie, word) {
