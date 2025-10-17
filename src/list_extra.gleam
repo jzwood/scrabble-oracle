@@ -1,5 +1,6 @@
 import gleam/dict.{type Dict}
 import gleam/list
+import gleam/option.{type Option, None, Some}
 import gleam/order.{type Order, Eq, Gt, Lt}
 
 /// note: modified from gleam/list to include value transform
@@ -81,5 +82,20 @@ pub fn is_sorted(xs: List(a), cmp: fn(a, a) -> Order) -> Bool {
         Gt -> False
       }
     }
+  }
+}
+
+pub fn pop(list: List(a), target: a) -> Option(List(a)) {
+  case
+    list.fold(list, #(False, []), fn(acc, val) {
+      case acc {
+        #(True, list) -> #(True, [val, ..list])
+        #(False, list) if val == target -> #(True, list)
+        #(False, list) -> #(False, [val, ..list])
+      }
+    })
+  {
+    #(False, _) -> None
+    #(True, list) -> Some(list)
   }
 }

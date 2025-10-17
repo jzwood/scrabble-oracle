@@ -44,8 +44,8 @@ pub fn main_test_ignore() {
 
   io.println("building dictionary: ongoing")
   //let dict =
-    //string.split(words, "\n")
-    //|> trie.build_dictionary()
+  //string.split(words, "\n")
+  //|> trie.build_dictionary()
   //|> scrabble.build_cloze_dictionary
   io.println("building dictionary: done")
   //string.inspect(dict)

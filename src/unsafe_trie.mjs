@@ -1,26 +1,3 @@
-//export function build(words) {
-  //const trie = empty();
-  //words
-    //.split("\n")
-    //.forEach((word) => {
-      //insert(trie, Array.from(word));
-    //});
-  //return trie;
-//}
-
-//export function buildBackwards(words) {
-  //const trie = empty();
-  //words
-    //.split("\n")
-    //.forEach((word) => {
-      //const chars = Array.from(word).reverse();
-      //do {
-        //insert(trie, chars);
-      //} while (chars.pop());
-    //});
-  //return trie;
-//}
-
 function empty() {
   return { terminal: false, children: {} };
 }

@@ -1,12 +1,11 @@
 import gleam/dict.{type Dict}
 import gleam/dynamic.{type Dynamic}
-import gleam/dynamic/decode.{type DecodeError, type Decoder}
-import gleam/io
+import gleam/dynamic/decode.{type Decoder}
 import gleam/list
 import gleam/option.{None, Some}
-import gleam/result
 import gleam/string
-import types.{type Char, type Rack}
+import list_extra
+import types.{type Char, type Cloze, type Rack, Rack}
 
 pub type Trie {
   Trie(terminal: Bool, children: Dict(Char, Trie))
@@ -47,51 +46,10 @@ pub fn build_dictionary(words: String) -> Dictionary {
   }
 }
 
-//pub fn build_dictionary(words: String) -> Dictionary {
-  //io.println("forward: ongoing")
-  //let forward = unsafe_build(words)
-  //io.println("forward: done")
-
-  //io.println("backward: setup")
-  //let backward =
-    //string.split(words, "\n")
-    //|> list.flat_map(fn(word) {
-      //string.to_graphemes(word)
-      //|> list.scan([], list.prepend)
-      //|> list.map(string.join(_, ""))
-    //})
-    //|> string.join("\n")
-    //|> fn(words) {
-        //io.println("backward: setup done")
-        //io.println("backward: ongoing")
-        //words
-      //}
-    //|> unsafe_build
-    //io.println("backward: done")
-
-  //Dictionary(forward, backward)
-//}
-
-fn empty() -> Trie {
-  Trie(False, dict.new())
-}
-
-pub fn insert(trie: Trie, word: String) -> Trie {
+pub fn member(trie: Trie, word: String) -> Bool {
   case string.pop_grapheme(word) {
-    Error(Nil) -> Trie(True, trie.children)
+    Error(Nil) -> trie.terminal
     Ok(#(char, tail)) ->
-      dict.get(trie.children, char)
-      |> result.unwrap(empty())
-      |> insert(tail)
-      |> dict.insert(trie.children, char, _)
-      |> Trie(trie.terminal, _)
-  }
-}
-
-pub fn member(trie: Trie, word: List(Char)) -> Bool {
-  case word {
-    [] -> trie.terminal
-    [char, ..tail] ->
       case dict.get(trie.children, char) {
         Ok(trie) -> member(trie, tail)
         Error(Nil) -> False
@@ -99,6 +57,61 @@ pub fn member(trie: Trie, word: List(Char)) -> Bool {
   }
 }
 
-pub fn explore(trie: Trie, rack: Rack) -> List(String) {
+pub fn walk_up(trie: Trie, cloze: Cloze, rack: Rack) -> List(String) {
+  //let start_char =
   todo
 }
+
+// THINK ABOUT HOW TO MAKE THIS MORE GENERIC SUCH THAT WALK_UP AND IS_MEMBER
+// COULD BOTH BE IMPLEMENTED WITH IT. CRITICALLY, WE CARE ABOUT WHETHER TRIE IS
+// LEAF NODE, AKA dict.size(trie.children) == 0
+pub fn explore(
+  trie: Trie,
+  cloze: Cloze,
+  rack: Rack,
+  trail: List(Char),
+) -> List(List(Char)) {
+  case cloze {
+    [] ->
+      case trie.terminal {
+        True -> [trail]
+        False -> []
+      }
+    [Ok(char), ..cloze] ->
+      case dict.get(trie.children, char) {
+        // cloze head not in trie: dead end
+        Error(Nil) -> []
+        // cloze head in trie: recurse
+        Ok(trie) -> explore(trie, cloze, rack, [char, ..trail])
+      }
+    // cloze head unspecified
+    [Error(Nil), ..cloze] ->
+      dict.to_list(trie.children)
+      |> list.flat_map(fn(tup) {
+        let #(key, trie) = tup
+        case list_extra.pop(rack.chars, key) {
+          // key in trie not found in rack but rack contains > 1 blanks: recurse with 1 fewer blank
+          None if rack.num_blanks > 0 ->
+            explore(trie, cloze, Rack(rack.chars, rack.num_blanks - 1), [
+              key,
+              ..trail
+            ])
+          // key in trie not found in rack: dead end
+          None -> []
+          // key in trie found in rack: recurse
+          Some(rack_chars) ->
+            explore(trie, cloze, Rack(rack_chars, rack.num_blanks), [
+              key,
+              ..trail
+            ])
+        }
+      })
+  }
+}
+// compare trie.children keys against first char
+
+// CLOZE: ___A_B__C
+// CLOZE: Z__A_B__C
+// rack: ABCD
+// trie: {x, y, z}
+//
