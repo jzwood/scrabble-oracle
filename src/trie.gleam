@@ -1,3 +1,4 @@
+import function_extra.{compose}
 import gleam/dict.{type Dict}
 import gleam/dynamic.{type Dynamic}
 import gleam/dynamic/decode.{type Decoder}
@@ -58,56 +59,84 @@ pub fn member(trie: Trie, word: String) -> Bool {
   }
 }
 
-pub fn walk_up(trie: Trie, cloze: Cloze, rack: Rack) -> List(String) {
-  //let start_char =
-  todo
-}
-
-// THINK ABOUT HOW TO MAKE THIS MORE GENERIC SUCH THAT WALK_UP AND IS_MEMBER
-// COULD BOTH BE IMPLEMENTED WITH IT. CRITICALLY, WE CARE ABOUT WHETHER TRIE IS
-// LEAF NODE, AKA dict.size(trie.children) == 0
-// HMMM IS THAT TRUE???
-pub fn explore(
-  trie: Trie,
+pub fn discover(
+  dictionary: Dictionary,
   cloze: Cloze,
   rack: Rack,
-  trail: List(Char),
 ) -> List(String) {
-  case cloze {
-    [] ->
-      case trie.terminal {
-        True -> [list.reverse(trail) |> string.concat()]
-        False -> []
+  let Dictionary(forward, backward) = dictionary
+  case list.split_while(cloze, result.is_error) {
+    #(_, []) -> explore(forward, cloze, rack)
+    #(before, [Ok(char), ..after]) ->
+      explore(backward, [Ok(char), ..list.reverse(before)], rack)
+    // PULL THIS OUT OF COMPOSE -- WE NEED DIG PREFIX BELOW
+    //|> list.filter_map(compose(dig(forward, _), string.reverse))
+    //|> list_extra.flat_map(explore(_, after,,_))
+    _ -> panic as "unreachable state reached"
+    //
+  }
+}
+
+pub fn explore(trie: Trie, cloze: Cloze, rack: Rack) -> List(String) {
+  explore_inner([#(trie, cloze, rack, [])], [])
+}
+
+// TODO redo the comments -- the logic changed
+pub fn explore_inner(
+  entry_points: List(#(Trie, Cloze, Rack, List(Char))),
+  acc: List(String),
+) -> List(String) {
+  case entry_points {
+    [] -> acc
+    [entry, ..tail_entries] -> {
+      let #(trie, cloze, rack, trail) = entry
+      case cloze {
+        [] ->
+          case trie.terminal {
+            True -> [list.reverse(trail) |> string.concat(), ..acc]
+            False -> explore_inner(tail_entries, acc)
+          }
+        [Ok(char), ..cloze] ->
+          case dict.get(trie.children, char) {
+            // cloze head not in trie: dead end
+            Error(Nil) -> explore_inner(tail_entries, acc)
+            // cloze head in trie: recurse
+            Ok(trie) ->
+              explore_inner(
+                [#(trie, cloze, rack, [char, ..trail]), ..tail_entries],
+                acc,
+              )
+          }
+        // cloze head unspecified
+        [Error(Nil), ..cloze] ->
+          dict.to_list(trie.children)
+          |> list.filter_map(fn(tup) {
+            let #(key, trie) = tup
+            case list_extra.pop(rack.chars, key) {
+              // key in trie not found in rack but rack contains > 1 blanks: recurse with 1 fewer blank
+              None if rack.num_blanks > 0 ->
+                Ok(
+                  #(trie, cloze, Rack(rack.chars, rack.num_blanks - 1), [
+                    key,
+                    ..trail
+                  ]),
+                )
+              // key in trie not found in rack: dead end
+              None -> Error(Nil)
+              // key in trie found in rack: recurse
+              Some(rack_chars) ->
+                Ok(
+                  #(trie, cloze, Rack(rack_chars, rack.num_blanks), [
+                    key,
+                    ..trail
+                  ]),
+                )
+            }
+          })
+          |> list_extra.append(tail_entries)
+          |> explore_inner(acc)
       }
-    [Ok(char), ..cloze] ->
-      case dict.get(trie.children, char) {
-        // cloze head not in trie: dead end
-        Error(Nil) -> []
-        // cloze head in trie: recurse
-        Ok(trie) -> explore(trie, cloze, rack, [char, ..trail])
-      }
-    // cloze head unspecified
-    [Error(Nil), ..cloze] ->
-      dict.to_list(trie.children)
-      |> list.flat_map(fn(tup) {
-        let #(key, trie) = tup
-        case list_extra.pop(rack.chars, key) {
-          // key in trie not found in rack but rack contains > 1 blanks: recurse with 1 fewer blank
-          None if rack.num_blanks > 0 ->
-            explore(trie, cloze, Rack(rack.chars, rack.num_blanks - 1), [
-              key,
-              ..trail
-            ])
-          // key in trie not found in rack: dead end
-          None -> []
-          // key in trie found in rack: recurse
-          Some(rack_chars) ->
-            explore(trie, cloze, Rack(rack_chars, rack.num_blanks), [
-              key,
-              ..trail
-            ])
-        }
-      })
+    }
   }
 }
 

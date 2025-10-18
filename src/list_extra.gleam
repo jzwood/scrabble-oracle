@@ -2,6 +2,7 @@ import gleam/dict.{type Dict}
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/order.{type Order, Eq, Gt, Lt}
+import gleam/string
 
 /// note: modified from gleam/list to include value transform
 pub fn group(
@@ -55,6 +56,10 @@ pub fn map(list: List(a), with fun: fn(a) -> b) -> List(b) {
   list.fold(list, [], fn(acc, a) { [fun(a), ..acc] })
 }
 
+pub fn flat_map(list: List(a), with fun: fn(a) -> List(b)) -> List(b) {
+  list.fold(list, [], fn(acc, a) { append(fun(a), acc) })
+}
+
 /// produces every pair between 2 lists as a 2-tuple
 pub fn pairs(xs: List(a), ys: List(b)) -> List(#(a, b)) {
   list.flat_map(xs, fn(x) { map(ys, fn(y) { #(x, y) }) })
@@ -84,6 +89,21 @@ pub fn is_sorted(xs: List(a), cmp: fn(a, a) -> Order) -> Bool {
     }
   }
 }
+
+//pub fn split_after(
+//after: List(a),
+//before: List(a),
+//predicate: fn(a) -> Bool,
+//) -> #(List(a), List(a)) {
+//case after {
+//[] -> #(list.reverse(before), [])
+//[head, ..tail] ->
+//case predicate(head) {
+//False -> split_after(tail, [head, ..before], predicate)
+//True -> #(list.reverse(before), after)
+//}
+//}
+//}
 
 pub fn pop(list: List(a), target: a) -> Option(List(a)) {
   case

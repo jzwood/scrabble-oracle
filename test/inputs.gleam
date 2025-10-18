@@ -1,5 +1,4 @@
-const test_words =
-"
+const test_words = "
 AA
 AB
 AAH

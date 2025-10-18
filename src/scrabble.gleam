@@ -126,7 +126,7 @@ pub fn build_cloze_dictionary(words: List(String)) -> Dictionary {
 /// finds all cells corresponding to empty squares that are immediately orthogonal to squares with tiles
 fn build_adjacent_cells(board: Board) -> Set(Cell) {
   dict.keys(board)
-  |> list.flat_map(fn(cell) {
+  |> list_extra.flat_map(fn(cell) {
     let Cell(x, y) = cell
     [Cell(x, y + 1), Cell(x + 1, y), Cell(x, y - 1), Cell(x - 1, y)]
   })
@@ -143,7 +143,7 @@ fn all_playspots(board: Board, rack: Rack) -> List(Playspot) {
   let rack_size = list.length(rack.chars) + rack.num_blanks
   let word_sizes = list.range(shortest_word, longest_word)
   let adjacent = build_adjacent_cells(board)
-  list.flat_map(word_sizes, fn(word_size) {
+  list_extra.flat_map(word_sizes, fn(word_size) {
     // every row
     let rows = list.range(0, longest_word - 1)
     // every col for start of word where word fits

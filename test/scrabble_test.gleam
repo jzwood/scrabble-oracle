@@ -3,6 +3,7 @@ import gleam/list
 import gleam/string
 import gleeunit
 import scrabble
+
 //import simplifile.{read, write}
 import trie
 
@@ -37,6 +38,7 @@ const rack = "FEASTTH"
 
 // gleeunit test functions end in `_test`
 pub fn main_test_ignore() {
+  todo
   //io.println("YOU SHOULD NOT BE SEEING THIS")
   //io.println("reading words: ongoing")
   //let assert Ok(words) = read(from: words_path)
