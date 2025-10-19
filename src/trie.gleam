@@ -6,9 +6,9 @@ import gleam/list
 import gleam/option.{None, Some}
 import gleam/result
 import gleam/string
+import io_extra.{debug}
 import list_extra
 import types.{type Char, type Cloze, type Rack, Rack}
-import io_extra.{debug}
 
 pub type Trie {
   Trie(terminal: Bool, children: Dict(Char, Trie))
@@ -96,7 +96,11 @@ pub fn explore_inner(
       case cloze {
         [] ->
           case trie.terminal {
-            True -> [list.reverse(trail) |> string.concat(), ..acc]
+            True ->
+              explore_inner(tail_entries, [
+                list.reverse(trail) |> string.concat(),
+                ..acc
+              ])
             False -> explore_inner(tail_entries, acc)
           }
         [Ok(char), ..cloze] ->
