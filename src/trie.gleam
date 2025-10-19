@@ -71,6 +71,14 @@ pub fn discover(
     #(before, [Ok(char), ..after]) ->
       explore(backward, [Ok(char), ..list.reverse(before)], rack)
     // PULL THIS OUT OF COMPOSE -- WE NEED DIG PREFIX BELOW
+      |> list.filter_map(fn(backward_word) {
+        let word = backward_word |> string.reverse()
+        dig(forward, word)
+        |> result.map(fn(trie) {
+            // TODO we need to figure out how to get the correct rack data here
+            #(trie, after, todo, string.to_graphemes(word))
+          })
+        })
     //|> list.filter_map(compose(dig(forward, _), string.reverse))
     //|> list_extra.flat_map(explore(_, after,,_))
     _ -> panic as "unreachable state reached"
@@ -82,9 +90,9 @@ pub fn explore(trie: Trie, cloze: Cloze, rack: Rack) -> List(String) {
   explore_inner([#(trie, cloze, rack, [])], [])
 }
 
-// explore_inner recursively explores a trie while conforming to cloze and rack
-// given that each trie node can branch and we want explore_inner to be TCO, we
-// need to explicitly track frontier inputs and accumulated results
+/// EXPLORE_INNER recursively explores a trie while conforming to cloze and rack
+/// given that each trie node can branch and we want explore_inner to be TCO, we
+/// need to explicitly track frontier inputs and accumulated results
 pub fn explore_inner(
   entry_points: List(#(Trie, Cloze, Rack, List(Char))),
   acc: List(String),
