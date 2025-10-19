@@ -20,8 +20,10 @@ export function buildDictionary(words) {
 
 function insert(trie, word) {
   const [char, ...tail] = word;
-  if (!char) return trie;
-  trie.terminal ||= tail.length === 0;
+  if (!char) {
+    trie.terminal = true;
+    return trie;
+  }
   trie.children[char] ??= empty();
   insert(trie.children[char], tail);
 }

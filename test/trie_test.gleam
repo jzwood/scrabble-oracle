@@ -6,6 +6,7 @@ import scrabble
 import simplifile.{read, write}
 import trie.{Dictionary}
 import types.{type Cloze, Rack}
+import io_extra.{debug}
 
 const test_words = "
 AA
@@ -29,7 +30,15 @@ pub fn main() -> Nil {
 
 pub fn main_test() {
   let Dictionary(forward, _backward) = trie.build_dictionary(test_words)
+
   let cloze = [Ok("A"), Error(Nil), Ok("A"), Error(Nil), Error(Nil)]
+  let rack = Rack(["B", "C", "I", "S", "K"], 0)
+  assert ["ABACI", "ABACK", "ABACS"] == trie.explore(forward, cloze, rack)
+
+  let cloze = [Ok("A"), Ok("A")]
+  let rack = Rack(["A", "A"], 0)
+  assert ["AA"] == trie.explore(forward, cloze, rack)
+
   let rack = Rack(["C", "I", "S", "K"], 2)
 
   assert ["ABACA", "ABACI", "ABACK", "ABACS", "ABAKA"]
@@ -38,10 +47,4 @@ pub fn main_test() {
   let rack = Rack(["C", "I", "S", "K"], 1)
   assert ["ABACI", "ABACK", "ABACS"] == trie.explore(forward, cloze, rack)
 
-  let rack = Rack(["B", "C", "I", "S", "K"], 0)
-  assert ["ABACI", "ABACK", "ABACS"] == trie.explore(forward, cloze, rack)
-
-  let cloze = [Ok("A"), Ok("A")]
-  let rack = Rack(["A", "A"], 0)
-  assert ["AA"] == trie.explore(forward, cloze, rack)
 }
