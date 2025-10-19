@@ -81,7 +81,9 @@ pub fn explore(trie: Trie, cloze: Cloze, rack: Rack) -> List(String) {
   explore_inner([#(trie, cloze, rack, [])], [])
 }
 
-// TODO redo the comments -- the logic changed
+// explore_inner recursively explores a trie while conforming to cloze and rack
+// given that each trie node can branch and we want explore_inner to be TCO, we
+// need to explicitly track frontier inputs and accumulated results
 pub fn explore_inner(
   entry_points: List(#(Trie, Cloze, Rack, List(Char))),
   acc: List(String),
