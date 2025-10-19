@@ -20,7 +20,7 @@ export function buildDictionary(words) {
 
 function insert(trie, word) {
   const [char, ...tail] = word;
-  if (!char) {
+  if (char == null) {
     trie.terminal = true;
     return trie;
   }

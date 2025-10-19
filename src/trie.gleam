@@ -8,6 +8,7 @@ import gleam/result
 import gleam/string
 import list_extra
 import types.{type Char, type Cloze, type Rack, Rack}
+import io_extra.{debug}
 
 pub type Trie {
   Trie(terminal: Bool, children: Dict(Char, Trie))
