@@ -7,18 +7,7 @@
 
 ## Algorithm
 
-1. precompute dictionary with set of all words and lookups for cloze compatible
-   words
-
-        pub type ClozeKey {
-          Key(length: Int, index: Int, char: String)
-          DefaultKey(length: Int)
-        }
-
-        pub type Dictionary {
-          Dictionary(clozes: Dict(ClozeKey, List(String)), words: Set(String))
-        }
-
+1. precompute trie from word list.
 2. get coordinates (aka playspot) of every legal place to play (i.e. physically
    legal, no dictionary checks yet)
    - filter each playspot by 3 criteria:
@@ -33,14 +22,12 @@
    - now each cloze will be associated with 1+ playspots
    - `dict(cloze, list(playspot))`
 5. for every cloze find every dictionary valid word that is compatible with
-   cloze and rack
-   - use pre-computed dictionary to get filtered list of words, then perform
-     linear scan
-   - `#(list(playspots), list(word))`
+   cloze and rack (on main axis)
+   - explore trie
 6. flatten into `#(playspot, word)` pairs
+   - `#(list(playspots), list(word)) -> list(#(playspot, word))`
 7. remove from `#(playspot, word)` list any pairing that, if played, produces a
-   word not in the dictionary
-   - check both main axis and all cross-axes
+   word not in the dictionary (on cross-axis)
 8. score all remaining valid playable spots and order from highest point value
    to lowest
 
