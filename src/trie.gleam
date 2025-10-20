@@ -1,21 +1,14 @@
-import function_extra.{compose}
 import gleam/dict.{type Dict}
 import gleam/dynamic.{type Dynamic}
 import gleam/dynamic/decode.{type Decoder}
 import gleam/list
 import gleam/option.{None, Some}
-import gleam/result
 import gleam/string
-import io_extra.{debug}
 import list_extra
 import types.{type Char, type Cloze, type Rack, Rack}
 
 pub type Trie {
   Trie(terminal: Bool, children: Dict(Char, Trie))
-}
-
-pub type Dictionary {
-  Dictionary(forward: Trie, backward: Trie)
 }
 
 @external(javascript, "./unsafe_trie.mjs", "buildDictionary")
@@ -31,14 +24,8 @@ fn decode_trie() -> Decoder(Trie) {
   decode.success(Trie(terminal, children))
 }
 
-fn decode_dictionary() -> Decoder(Dictionary) {
-  use forward <- decode.field("forward", decode_trie())
-  use backward <- decode.field("forward", decode_trie())
-  decode.success(Dictionary(forward, backward))
-}
-
-pub fn build_dictionary(words: String) -> Dictionary {
-  case decode.run(unsafe_build_dictionary(words), decode_dictionary()) {
+pub fn build(words: String) -> Trie {
+  case decode.run(unsafe_build_dictionary(words), decode_trie()) {
     Ok(dictionary) -> {
       dictionary
     }
@@ -60,32 +47,6 @@ pub fn member(trie: Trie, word: String) -> Bool {
   }
 }
 
-pub fn discover(
-  dictionary: Dictionary,
-  cloze: Cloze,
-  rack: Rack,
-) -> List(String) {
-  let Dictionary(forward, backward) = dictionary
-  case list.split_while(cloze, result.is_error) {
-    #(_, []) -> explore(forward, cloze, rack)
-    #(before, [Ok(char), ..after]) ->
-      explore(backward, [Ok(char), ..list.reverse(before)], rack)
-    // PULL THIS OUT OF COMPOSE -- WE NEED DIG PREFIX BELOW
-      |> list.filter_map(fn(backward_word) {
-        let word = backward_word |> string.reverse()
-        dig(forward, word)
-        |> result.map(fn(trie) {
-            // TODO we need to figure out how to get the correct rack data here
-            #(trie, after, todo, string.to_graphemes(word))
-          })
-        })
-    //|> list.filter_map(compose(dig(forward, _), string.reverse))
-    //|> list_extra.flat_map(explore(_, after,,_))
-    _ -> panic as "unreachable state reached"
-    //
-  }
-}
-
 pub fn explore(trie: Trie, cloze: Cloze, rack: Rack) -> List(String) {
   explore_inner([#(trie, cloze, rack, [])], [])
 }
@@ -93,7 +54,7 @@ pub fn explore(trie: Trie, cloze: Cloze, rack: Rack) -> List(String) {
 /// EXPLORE_INNER recursively explores a trie while conforming to cloze and rack
 /// given that each trie node can branch and we want explore_inner to be TCO, we
 /// need to explicitly track frontier inputs and accumulated results
-pub fn explore_inner(
+fn explore_inner(
   entry_points: List(#(Trie, Cloze, Rack, List(Char))),
   acc: List(String),
 ) -> List(String) {
@@ -154,20 +115,3 @@ pub fn explore_inner(
     }
   }
 }
-
-pub fn dig(trie: Trie, path: String) -> Result(Trie, Nil) {
-  case string.pop_grapheme(path) {
-    Error(Nil) -> Ok(trie)
-    Ok(#(char, path)) ->
-      dict.get(trie.children, char)
-      |> result.try(dig(_, path))
-  }
-}
-// compare trie.children keys against first char
-
-// CLOZE: ___A_B__C
-// CLOZE: Z__A_B__C
-// rack: ABCD
-// trie: {x, y, z}
-//
-// explore: Trie, word -> true

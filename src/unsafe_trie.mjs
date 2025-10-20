@@ -3,19 +3,14 @@ function empty() {
 }
 
 export function buildDictionary(words) {
-  const forward = empty();
-  const backward = empty();
+  const trie = empty();
   words
     .split("\n")
     .forEach((word) => {
       const chars = Array.from(word);
-      insert(forward, chars);
-      chars.reverse();
-      do {
-        insert(backward, chars);
-      } while (chars.pop());
+      insert(trie, chars);
     });
-  return { forward, backward };
+  return trie;
 }
 
 function insert(trie, word) {

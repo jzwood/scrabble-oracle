@@ -1,8 +1,6 @@
 import board
 import gleam/dict
-import gleam/function
 import gleam/int
-import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
 import gleam/pair
@@ -11,10 +9,11 @@ import gleam/set.{type Set}
 import gleam/string
 import list_extra
 import simplifile.{type FileError, read}
+import trie.{type Trie}
 import types.{
-  type Board, type Cell, type Char, type Cloze, type Dictionary, type Playspot,
-  type Rack, Cell, DefaultKey, Dictionary, DoubleLetterScore, DoubleWordScore,
-  Key, Rack, Square, Tile, TripleLetterScore, TripleWordScore,
+  type Board, type Cell, type Char, type Cloze, type Playspot,
+  type Rack, Cell,  DoubleLetterScore, DoubleWordScore,
+  Square, Tile, TripleLetterScore, TripleWordScore,
 }
 
 const board_size = 15
@@ -23,7 +22,7 @@ pub fn main(
   rack_str: String,
   num_blanks: Int,
   board_str: String,
-  dictionary: Dictionary,
+  dictionary: Trie,
   // make ahead of time
 ) -> Result(List(#(String, Playspot, Int)), String) {
   case board.parse_rack(rack_str, num_blanks), board.parse_board(board_str) {
@@ -35,26 +34,21 @@ pub fn main(
 
 pub fn precompute_dictionary(
   words_path: String,
-) -> Result(Dictionary, FileError) {
+) -> Result(Trie, FileError) {
   read(words_path)
-  |> result.map(fn(words) {
-    string.split(words, "\n")
-    |> build_cloze_dictionary
-  })
+  |> result.map(trie.build)
 }
 
 pub fn calculate_plays(
   board: Board,
   rack: Rack,
-  dictionary: Dictionary,
+  dictionary: Trie,
 ) -> List(#(String, Playspot, Int)) {
   all_playspots(board, rack)
   |> list_extra.map(get_cloze(board, _))
   |> list_extra.group(by: pair.first, transform: pair.second)
   |> dict.fold([], fn(acc, cloze: Cloze, playspots: List(Playspot)) {
-    let words: List(String) =
-      cloze_words(cloze, dictionary)
-      |> list_extra.filter(rack_compatible(rack, cloze, _))
+    let words : List(String) = trie.explore(dictionary, cloze, rack)
     list_extra.append(list_extra.pairs(words, playspots), acc)
   })
   |> list.filter_map(score(_, board, dictionary))
@@ -63,64 +57,6 @@ pub fn calculate_plays(
     let #(_, _, b) = b
     int.compare(b, a)
   })
-}
-
-/// wrapper for can_rack_play_word
-/// FAILURE MODE
-/// the word is not guarenteed to match cloze -- only that it might match. we
-/// only know that at least 1 letter matches!!!!!!!!!
-fn rack_compatible(rack: Rack, cloze: Cloze, word: String) -> Bool {
-  let chars =
-    case string.to_graphemes(word) |> list.strict_zip(cloze, _) {
-      Error(Nil) -> panic as "cloze and word lengths do not match"
-      Ok(pairs) ->
-        list.filter_map(pairs, fn(tup) {
-          case tup {
-            #(Ok(_), _) -> Error(Nil)
-            #(Error(Nil), char) -> Ok(char)
-          }
-        })
-    }
-    |> list.sort(string.compare)
-  let assert True = list_extra.is_sorted(rack.chars, string.compare)
-  let assert True = list_extra.is_sorted(chars, string.compare)
-  case word, can_rack_play_word(rack, chars) {
-    "AARDWOLVES", True -> {
-      io.println(string.inspect(rack))
-      io.println(word)
-      io.println(string.inspect(cloze))
-      io.println("----------")
-      True
-    }
-    _, can -> can
-  }
-}
-
-/// does the rack have the necessary tiles to play the word?
-/// simliar to `are chars subset of rack?` but also handles blanks
-fn can_rack_play_word(rack: Rack, chars: List(Char)) -> Bool {
-  case rack, chars {
-    _, [] -> True
-    Rack([h1, ..t1], blanks), [h2, ..t2] if h1 == h2 ->
-      can_rack_play_word(Rack(t1, blanks), t2)
-    Rack(chars, blanks), [_, ..tail] if blanks > 0 ->
-      can_rack_play_word(Rack(chars, blanks - 1), tail)
-    _, _ -> False
-  }
-}
-
-/// cloze length, index of first known letter, letter List(String) // word list
-pub fn build_cloze_dictionary(words: List(String)) -> Dictionary {
-  Dictionary(
-    list.fold(words, dict.new(), fn(acc, word) {
-      let length = string.length(word)
-      string.to_graphemes(word)
-      |> list.index_map(fn(char, index) { Key(length, index, char) })
-      |> list.prepend(DefaultKey(length))
-      |> list_extra.group_inner(function.identity, fn(_) { word }, acc)
-    }),
-    set.from_list(words),
-  )
 }
 
 /// finds all cells corresponding to empty squares that are immediately orthogonal to squares with tiles
@@ -238,26 +174,6 @@ fn get_cloze(board: Board, playspot: Playspot) -> #(Cloze, Playspot) {
   #(cloze, playspot)
 }
 
-/// gets every word list for each cloze (char, index) pair and returns the
-/// shortest of these word lists
-fn cloze_words(cloze: Cloze, dictionary: Dictionary) -> List(String) {
-  let length = list.length(cloze)
-  let assert Ok(words) = dict.get(dictionary.clozes, DefaultKey(length))
-
-  list.index_fold(cloze, words, fn(acc, char, index) {
-    result.try(char, fn(char) {
-      dict.get(dictionary.clozes, Key(length, index, char))
-      |> result.map(fn(words) {
-        case list.length(words) < list.length(acc) {
-          True -> words
-          False -> acc
-        }
-      })
-    })
-    |> result.unwrap(acc)
-  })
-}
-
 /// scores it according to scrabble scoring rules
 /// taking into account bonuses, cross-axis words, and bingos
 /// by construction, expects the main-axis word to be dictionary legal;
@@ -265,7 +181,7 @@ fn cloze_words(cloze: Cloze, dictionary: Dictionary) -> List(String) {
 fn score(
   word_playspot: #(String, Playspot),
   board: Board,
-  dictionary: Dictionary,
+  dictionary: Trie,
 ) -> Result(#(String, Playspot, Int), Nil) {
   let assert #(word, [Cell(x1, y1), Cell(x2, y2), ..] as playspot) =
     word_playspot
@@ -287,7 +203,7 @@ fn score(
           case
             list.map(word, pair.first)
             |> string.concat
-            |> set.contains(dictionary.words, _)
+            |> trie.member(dictionary, _)
           {
             True -> Some(score_word(word, board) + total)
             False -> None

@@ -1,12 +1,6 @@
-import gleam/io
-import gleam/list
-import gleam/string
 import gleeunit
-import io_extra.{debug}
-import scrabble
-import simplifile.{read, write}
-import trie.{Dictionary}
-import types.{type Cloze, Rack}
+import trie
+import types.{Rack}
 
 const test_words = "
 AA
@@ -29,7 +23,7 @@ pub fn main() -> Nil {
 }
 
 pub fn main_test() {
-  let Dictionary(forward, _backward) = trie.build_dictionary(test_words)
+  let forward = trie.build(test_words)
   let cloze = [Ok("A"), Error(Nil), Ok("A"), Error(Nil), Error(Nil)]
   let rack = Rack(["C", "I", "S", "K"], 2)
 

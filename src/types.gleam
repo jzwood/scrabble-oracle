@@ -1,6 +1,5 @@
 import gleam/dict.{type Dict}
 import gleam/option.{type Option}
-import gleam/set.{type Set}
 
 pub type Char =
   String
@@ -36,13 +35,3 @@ pub type Board =
 
 pub type Cloze =
   List(Result(Char, Nil))
-
-// "__X__R"
-pub type ClozeKey {
-  Key(length: Int, index: Int, char: Char)
-  DefaultKey(length: Int)
-}
-
-pub type Dictionary {
-  Dictionary(clozes: Dict(ClozeKey, List(Char)), words: Set(String))
-}
