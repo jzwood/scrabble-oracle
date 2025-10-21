@@ -7,13 +7,14 @@ import gleam/pair
 import gleam/result
 import gleam/set.{type Set}
 import gleam/string
+import io_extra.{debug}
 import list_extra
 import simplifile.{type FileError, read}
 import trie.{type Trie}
 import types.{
-  type Board, type Cell, type Char, type Cloze, type Playspot,
-  type Rack, Cell,  DoubleLetterScore, DoubleWordScore,
-  Square, Tile, TripleLetterScore, TripleWordScore,
+  type Board, type Cell, type Char, type Cloze, type Playspot, type Rack, Cell,
+  DoubleLetterScore, DoubleWordScore, Square, Tile, TripleLetterScore,
+  TripleWordScore,
 }
 
 const board_size = 15
@@ -32,9 +33,7 @@ pub fn main(
   }
 }
 
-pub fn precompute_dictionary(
-  words_path: String,
-) -> Result(Trie, FileError) {
+pub fn precompute_dictionary(words_path: String) -> Result(Trie, FileError) {
   read(words_path)
   |> result.map(trie.build)
 }
@@ -48,7 +47,7 @@ pub fn calculate_plays(
   |> list_extra.map(get_cloze(board, _))
   |> list_extra.group(by: pair.first, transform: pair.second)
   |> dict.fold([], fn(acc, cloze: Cloze, playspots: List(Playspot)) {
-    let words : List(String) = trie.explore(dictionary, cloze, rack)
+    let words: List(String) = trie.explore(dictionary, cloze, rack)
     list_extra.append(list_extra.pairs(words, playspots), acc)
   })
   |> list.filter_map(score(_, board, dictionary))
@@ -61,10 +60,17 @@ pub fn calculate_plays(
 
 /// finds all cells corresponding to empty squares that are immediately orthogonal to squares with tiles
 fn build_adjacent_cells(board: Board) -> Set(Cell) {
-  dict.keys(board)
-  |> list_extra.flat_map(fn(cell) {
-    let Cell(x, y) = cell
-    [Cell(x, y + 1), Cell(x + 1, y), Cell(x, y - 1), Cell(x - 1, y)]
+  dict.to_list(board)
+  |> list_extra.flat_map(fn(tup) {
+    case tup {
+      #(Cell(x, y), Square(Some(Tile(_, _)), _)) -> [
+        Cell(x, y + 1),
+        Cell(x + 1, y),
+        Cell(x, y - 1),
+        Cell(x - 1, y),
+      ]
+      _ -> []
+    }
   })
   |> list.prepend(Cell(7, 7))
   |> list_extra.filter_all([is_on_board, is_square_empty(board, _)])
@@ -93,14 +99,14 @@ fn all_playspots(board: Board, rack: Rack) -> List(Playspot) {
       pairs
       |> list_extra.map(fn(cell) {
         let Cell(c, r) = cell
-        list_extra.map(cells, fn(x) { Cell(c + x, r) })
+        list.map(cells, fn(x) { Cell(c + x, r) })
       })
 
     let vwords =
       pairs
       |> list_extra.map(fn(cell) {
         let Cell(c, r) = transpose_cell(cell)
-        list_extra.map(cells, fn(y) { Cell(c, r + y) })
+        list.map(cells, fn(y) { Cell(c, r + y) })
       })
 
     list_extra.append(hwords, vwords)

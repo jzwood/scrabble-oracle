@@ -1,9 +1,28 @@
 import board
 import gleam/dict
+import gleam/io
 import gleam/list
 import gleam/string
 import gleeunit
 import types.{Rack}
+
+const test_board = "
+  4__B___N___1__4
+  JOULES_A___QAT_
+  OY2E_T1R1___B__
+  1__E_A_CONE2O_1
+  _RUDER___ADORN_
+  _3___L_PIG__T3_
+  _V1__I1U1___I__
+  MILLINER___1OOF
+  _V1__G1G1___NO_
+  _A___3_E_3___Z_
+  ___NEXUS__2__E_
+  1_MAT__1___2_D_
+  __E___1_1___2__
+  _2W__3___3___2_
+  WAS1___4___1__4
+  "
 
 pub fn main() -> Nil {
   gleeunit.main()
@@ -41,4 +60,13 @@ pub fn parse_rack_test() {
     == board.parse_rack("IOUD", 1)
   assert Error("rack has unidentifiable letters")
     == board.parse_rack("HELLO!", 1)
+}
+
+pub fn pretty_print_test() {
+  let assert Ok(board) = test_board |> board.parse_board()
+
+  io.println("")
+  board
+  |> board.pretty_print()
+  |> io.println
 }

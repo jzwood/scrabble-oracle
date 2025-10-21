@@ -16,6 +16,8 @@ ABAFT
 ABAKA
 ABAMP
 ABAND
+ABACKS
+ABANDS
 "
 
 pub fn main() -> Nil {
@@ -39,4 +41,16 @@ pub fn main_test() {
   let cloze = [Ok("A"), Ok("A")]
   let rack = Rack(["A", "A"], 0)
   assert ["AA"] == trie.explore(forward, cloze, rack)
+
+  let cloze = [Ok("A"), Ok("B"), Ok("A"), Error(Nil), Error(Nil), Error(Nil)]
+  let rack = Rack(["N", "D", "S"], 0)
+  assert ["ABANDS"] == trie.explore(forward, cloze, rack)
+
+  let cloze = [Error(Nil), Ok("B"), Ok("A"), Ok("N"), Error(Nil), Error(Nil)]
+  let rack = Rack(["A", "D", "S"], 0)
+  assert ["ABANDS"] == trie.explore(forward, cloze, rack)
+
+  let cloze = [Error(Nil), Error(Nil), Error(Nil), Error(Nil), Error(Nil)]
+  let rack = Rack(["A", "A", "R", "T", "I"], 0)
+  assert ["AARTI"] == trie.explore(forward, cloze, rack)
 }

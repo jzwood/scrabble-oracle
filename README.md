@@ -23,7 +23,7 @@
    - `dict(cloze, list(playspot))`
 5. for every cloze find every dictionary valid word that is compatible with
    cloze and rack (on main axis)
-   - explore trie
+   - by exploring trie
 6. flatten into `#(playspot, word)` pairs
    - `#(list(playspots), list(word)) -> list(#(playspot, word))`
 7. remove from `#(playspot, word)` list any pairing that, if played, produces a

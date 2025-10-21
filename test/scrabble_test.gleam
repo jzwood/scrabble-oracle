@@ -4,7 +4,7 @@ import gleam/string
 import gleeunit
 import scrabble
 
-//import simplifile.{read, write}
+import simplifile.{read, write}
 import trie
 
 pub fn main() -> Nil {
@@ -37,24 +37,23 @@ const board = "
 const rack = "FEASTTH"
 
 // gleeunit test functions end in `_test`
-pub fn main_test_ignore() {
-  todo
-  //io.println("YOU SHOULD NOT BE SEEING THIS")
-  //io.println("reading words: ongoing")
-  //let assert Ok(words) = read(from: words_path)
-  //io.println("reading words: done")
+pub fn main_test_test() {
+  io.println("reading words: ongoing")
+  let assert Ok(words) = read(from: words_path)
+  io.println("reading words: done")
 
-  //io.println("building dictionary: ongoing")
-  //let dict =
-  //string.split(words, "\n")
-  //|> trie.build_dictionary()
-  //|> scrabble.build_cloze_dictionary
-  //io.println("building dictionary: done")
-  //string.inspect(dict)
-  //|> write(trie_dest, _)
-  //let assert Ok(words) = scrabble.main(rack, 0, board, dict)
+  io.println("building dictionary: ongoing")
+  let dict = trie.build(words)
+  io.println("building dictionary: done")
 
-  //words
-  //|> string.inspect
-  //|> io.println
+  let assert Ok(words) = scrabble.main(rack, 0, board, dict)
+
+  words
+  //|> list.map(fn(tup) {
+  //let #(word, _, points) = tup
+  //#(word, points)
+  //})
+  |> list.take(10)
+  |> string.inspect
+  |> io.println
 }
