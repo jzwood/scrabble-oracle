@@ -2,9 +2,12 @@ import board
 import gleam/dict
 import gleam/io
 import gleam/list
+import gleam/option.{None, Some}
+import gleam/set
 import gleam/string
 import gleeunit
-import types.{Rack}
+import io_extra.{debug}
+import types.{Rack, Square, Tile}
 
 const test_board = "
   4__B___N___1__4
@@ -64,9 +67,61 @@ pub fn parse_rack_test() {
 
 pub fn pretty_print_test() {
   let assert Ok(board) = test_board |> board.parse_board()
+  let expected =
+    "
+   012345678901234
+ 0 ___b___n_______  0
+ 1 joules_a___qat_  1
+ 2 oy_e_t_r____b__  2
+ 3 ___e_a_cone_o__  3
+ 4 _ruder___adorn_  4
+ 5 _____l_pig__t__  5
+ 6 _v___i_u____i__  6
+ 7 milliner____oof  7
+ 8 _v___g_g____no_  8
+ 9 _a_____e_____z_  9
+10 ___nexus_____e_ 10
+11 __mat________d_ 11
+12 __e____________ 12
+13 __w____________ 13
+14 was____________ 14
+   012345678901234
+"
 
-  io.println("")
-  board
-  |> board.pretty_print()
-  |> io.println
+  let actual = board.pretty_print(board)
+  assert actual == expected
+}
+
+pub fn build_adjacent_cells_test() {
+  let assert Ok(board) = board.parse_board(test_board)
+
+  let expected =
+    "
+   012345678901234
+ 0 AAA_AAA_A__AAA_  0
+ 1 ______A_A_A___A  1
+ 2 __A_A_A_AAAA_A_  2
+ 3 AAA_A_A____A_A_  3
+ 4 A_____AAA_____A  4
+ 5 _AAAA_A___AA_A_  5
+ 6 A_AAA_A_AA_A_AA  6
+ 7 ________A__A___  7
+ 8 A_AAA_A_A__A__A  8
+ 9 A_AAAAA_A___A_A  9
+10 _AA_____A___A_A 10
+11 _A___AAA____A_A 11
+12 _A_AA________A_ 12
+13 AA_A___________ 13
+14 ___A___________ 14
+   012345678901234
+"
+
+  let actual =
+    board.build_adjacent_cells(board)
+    |> set.to_list()
+    |> list.map(fn(cell) { #(cell, Square(Some(Tile("A", 0)), None)) })
+    |> dict.from_list
+    |> board.pretty_print
+
+  assert actual == expected
 }

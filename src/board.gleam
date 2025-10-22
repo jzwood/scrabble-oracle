@@ -3,12 +3,17 @@ import gleam/int
 import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
+import gleam/set.{type Set}
 import gleam/string
+import list_extra
 
 import types.{
-  type Board, type Char, type Rack, Cell, DoubleLetterScore, DoubleWordScore,
-  Rack, Square, Tile, TripleLetterScore, TripleWordScore,
+  type Board, type Cell, type Char, type Playspot, type Rack, Cell,
+  DoubleLetterScore, DoubleWordScore, Rack, Square, Tile, TripleLetterScore,
+  TripleWordScore,
 }
+
+const board_size = 15
 
 pub fn init() -> Board {
   let board: String =
@@ -143,37 +148,69 @@ pub fn parse_board(board: String) -> Result(Board, String) {
   }
 }
 
-pub fn pretty_print(board: Board) -> String {
-  let rows =
-    dict.to_list(board)
-    |> list.sort(fn(a, b) {
-      let #(Cell(ax, ay), _) = a
-      let #(Cell(bx, by), _) = b
-      case ay == by {
-        True -> int.compare(ax, bx)
-        False -> int.compare(ay, by)
-      }
-    })
-    |> list.map(fn(tup) {
-      let #(_, Square(tile, _)) = tup
-      case tile {
-        Some(Tile(char, _)) -> char
-        _ -> "_"
-      }
-    })
-    |> list.sized_chunk(15)
-
-  let cols = "   012345678901234\n"
-
-  cols
-  <> list.index_map(rows, fn(row, index) {
-    let rows = string.inspect(index) |> string.pad_start(2, " ")
-
-    rows <> " " <> string.concat(row) <> " " <> rows
+/// finds all cells corresponding to empty squares that are immediately orthogonal to squares with tiles
+pub fn build_adjacent_cells(board: Board) -> Set(Cell) {
+  dict.to_list(board)
+  |> list_extra.flat_map(fn(tup) {
+    case tup {
+      #(Cell(x, y), Square(Some(Tile(_, _)), _)) -> [
+        Cell(x, y + 1),
+        Cell(x + 1, y),
+        Cell(x, y - 1),
+        Cell(x - 1, y),
+      ]
+      _ -> []
+    }
   })
-  |> string.join("\n")
-  <> "\n"
-  <> cols
+  |> list.prepend(Cell(7, 7))
+  |> list_extra.filter_all([is_on_board, is_square_empty(board, _)])
+  |> set.from_list
+}
+
+/// rules out playspots that require more letters than the rack has
+pub fn rack_has_enough_letters(
+  board: Board,
+  playspot: Playspot,
+  rack_size: Int,
+) -> Bool {
+  list.count(playspot, is_square_empty(board, _)) <= rack_size
+}
+
+/// is cell's square off the board or empty?
+pub fn is_square_empty(board: Board, cell: Cell) -> Bool {
+  case dict.get(board, cell) {
+    Error(Nil) -> True
+    Ok(Square(None, _)) -> True
+    _ -> False
+  }
+}
+
+/// is cell's square off the board?
+fn is_on_board(cell: Cell) -> Bool {
+  let Cell(x, y) = cell
+  0 <= x && x < board_size && 0 <= y && y < board_size
+}
+
+pub fn pretty_print(board: Board) -> String {
+  let cols = "   012345678901234\n"
+  let rows =
+    list.range(0, board_size - 1)
+    |> list.map(fn(y) {
+      let i = string.inspect(y) |> string.pad_start(2, " ")
+      let row =
+        list.range(0, board_size - 1)
+        |> list.map(fn(x) {
+          case dict.get(board, Cell(x, y)) {
+            Ok(Square(Some(Tile(char, _)), _)) -> char
+            _ -> "_"
+          }
+        })
+        |> string.concat()
+      string.join([i, row, i <> "\n"], " ")
+    })
+    |> string.concat()
+
+  string.concat(["\n", cols, rows, cols])
 }
 //pub fn apply(board: Board, playspot: Playspot) -> Board {
 //todo

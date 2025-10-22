@@ -17,8 +17,6 @@ import types.{
   TripleWordScore,
 }
 
-const board_size = 15
-
 pub fn main(
   rack_str: String,
   num_blanks: Int,
@@ -58,25 +56,6 @@ pub fn calculate_plays(
   })
 }
 
-/// finds all cells corresponding to empty squares that are immediately orthogonal to squares with tiles
-fn build_adjacent_cells(board: Board) -> Set(Cell) {
-  dict.to_list(board)
-  |> list_extra.flat_map(fn(tup) {
-    case tup {
-      #(Cell(x, y), Square(Some(Tile(_, _)), _)) -> [
-        Cell(x, y + 1),
-        Cell(x + 1, y),
-        Cell(x, y - 1),
-        Cell(x - 1, y),
-      ]
-      _ -> []
-    }
-  })
-  |> list.prepend(Cell(7, 7))
-  |> list_extra.filter_all([is_on_board, is_square_empty(board, _)])
-  |> set.from_list
-}
-
 /// produces every single legal place to play a word. does not check against
 /// dictionary.
 fn all_playspots(board: Board, rack: Rack) -> List(Playspot) {
@@ -84,7 +63,7 @@ fn all_playspots(board: Board, rack: Rack) -> List(Playspot) {
   let longest_word = 15
   let rack_size = list.length(rack.chars) + rack.num_blanks
   let word_sizes = list.range(shortest_word, longest_word)
-  let adjacent = build_adjacent_cells(board)
+  let adjacent = board.build_adjacent_cells(board)
   list_extra.flat_map(word_sizes, fn(word_size) {
     // every row
     let rows = list.range(0, longest_word - 1)
@@ -114,8 +93,8 @@ fn all_playspots(board: Board, rack: Rack) -> List(Playspot) {
   |> list_extra.filter_all([
     is_not_subword(board, _),
     list.any(_, set.contains(adjacent, _)),
-    list.any(_, is_square_empty(board, _)),
-    rack_has_enough_letters(board, _, rack_size),
+    list.any(_, board.is_square_empty(board, _)),
+    board.rack_has_enough_letters(board, _, rack_size),
   ])
 }
 
@@ -141,31 +120,7 @@ fn is_not_subword(board: Board, playspot: Playspot) -> Bool {
       }
     _, _ -> panic as "impossible zero length playspot"
   }
-  |> list.all(is_square_empty(board, _))
-}
-
-/// rules out playspots that require more letters than the rack has
-fn rack_has_enough_letters(
-  board: Board,
-  playspot: Playspot,
-  rack_size: Int,
-) -> Bool {
-  list.count(playspot, is_square_empty(board, _)) <= rack_size
-}
-
-/// is cell's square off the board or empty?
-fn is_square_empty(board: Board, cell: Cell) -> Bool {
-  case dict.get(board, cell) {
-    Error(Nil) -> True
-    Ok(Square(None, _)) -> True
-    _ -> False
-  }
-}
-
-/// is cell's square off the board?
-fn is_on_board(cell: Cell) -> Bool {
-  let Cell(x, y) = cell
-  0 <= x && x < board_size && 0 <= y && y < board_size
+  |> list.all(board.is_square_empty(board, _))
 }
 
 /// self-explanatory

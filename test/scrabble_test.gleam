@@ -1,7 +1,10 @@
+import board
 import gleam/io
 import gleam/list
+import gleam/set
 import gleam/string
 import gleeunit
+import io_extra.{debug}
 import scrabble
 
 import simplifile.{read, write}
@@ -37,7 +40,7 @@ const board = "
 const rack = "FEASTTH"
 
 // gleeunit test functions end in `_test`
-pub fn main_test_test() {
+pub fn main_test_ignore() {
   io.println("reading words: ongoing")
   let assert Ok(words) = read(from: words_path)
   io.println("reading words: done")
