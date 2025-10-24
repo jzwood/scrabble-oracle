@@ -128,7 +128,7 @@ fn is_not_subword(board: Board, playspot: Playspot) -> Bool {
 /// self-explanatory
 fn get_cloze(board: Board, playspot: Playspot) -> #(Cloze, Playspot) {
   let cloze =
-    list_extra.map(playspot, fn(cell) {
+    list.map(playspot, fn(cell) {
       case dict.get(board, cell) {
         Ok(Square(Some(Tile(char, _)), _)) -> Ok(char)
         _ -> Error(Nil)
@@ -175,7 +175,6 @@ fn score(
     })
   })
   |> option.map(fn(total) {
-    debug(word)
     let points = score_word(placement, board)
     #(word, playspot, total + points)
   })
@@ -246,6 +245,8 @@ fn score_word(word: List(#(Char, Cell)), board: Board) -> Int {
       }
     })
 
+  debug(#( list.map(word, pair.first) |> string.concat, list.map(word, pair.second), total, multiplier), "A")
+
   total
   * multiplier
   + {
@@ -254,4 +255,5 @@ fn score_word(word: List(#(Char, Cell)), board: Board) -> Int {
       _ -> 0
     }
   }
+  |> debug("B")
 }

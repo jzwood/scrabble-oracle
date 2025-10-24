@@ -202,6 +202,7 @@ pub fn pretty_print(board: Board) -> String {
         |> list.map(fn(x) {
           case dict.get(board, Cell(x, y)) {
             Ok(Square(Some(Tile(char, _)), _)) -> char
+            Ok(Square(None, Some(_bonus))) -> "3" // change to be the correct code
             _ -> "_"
           }
         })

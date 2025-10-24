@@ -41,7 +41,28 @@ const board = "
   WAS1___4___1__4
   "
 
+
+const board2 =
+    "
+    4__1___4___1__4
+    _2___3___3___2_
+    __2___1_1___2__
+    1__2___1___2__1
+    ____2_____2____
+    _3___3___3___3_
+    __1___1_1___1__
+    4__1__BA___1__4
+    __1___1_1___1__
+    _3___3___3___3_
+    ____2_____2____
+    1__2___1___2___
+    __2___1_1___2__
+    _2___3___3___2_
+    4__1___4___1__4
+    "
+
 const rack = "FEASTTH"
+const rack2 = "HELLO"
 
 // gleeunit test functions end in `_test`
 pub fn main_test() {
@@ -53,9 +74,9 @@ pub fn main_test() {
   let dict = trie.build(words)
   io.println("building dictionary: done")
 
-  let assert Ok(words) = scrabble.main(rack, 0, board, dict)
+  let assert Ok(words) = scrabble.main(rack2, 0, board2, dict)
 
-  let assert Ok(board) = board.parse_board(board)
+  let assert Ok(board) = board.parse_board(board2)
   board.pretty_print(board)
   |> io.println
 
