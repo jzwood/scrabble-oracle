@@ -1,11 +1,15 @@
 import board
+import gleam/int
 import gleam/io
 import gleam/list
 import gleam/set
 import gleam/string
+import gleam/dict
 import gleeunit
 import io_extra.{debug}
 import scrabble
+import gleam/option.{Some, None}
+import types.{Cell, Square, Tile}
 
 import simplifile.{read, write}
 import trie
@@ -51,12 +55,33 @@ pub fn main_test_test() {
 
   let assert Ok(words) = scrabble.main(rack, 0, board, dict)
 
-  words
-  //|> list.map(fn(tup) {
-  //let #(word, _, points) = tup
-  //#(word, points)
-  //})
-  |> list.take(10)
-  |> string.inspect
+  let assert Ok(board) = board.parse_board(board)
+  board.pretty_print(board)
   |> io.println
+
+  //board.build_adjacent_cells(board)
+  //|> set.to_list()
+  //|> list.map(fn(cell) { #(cell, Square(Some(Tile("X", 0)), None)) })
+  //|> dict.from_list
+  //|> board.pretty_print
+  //|> io.println
+
+  words
+  |> list.take(10)
+  |> list.map(fn(tup) {
+    let #(word, playspots, points) = tup
+    let assert [Cell(x1, y1), ..] = playspots
+    let assert [Cell(x2, y2), ..] = playspots |> list.reverse()
+    io.println(string.join(
+      [
+        word,
+        int.to_string(points),
+        "(" <> int.to_string(x1) <> ",",
+        int.to_string(y1) <> ")",
+        "(" <> int.to_string(x2) <> ",",
+        int.to_string(y2) <> ")",
+      ],
+      " ",
+    ))
+  })
 }

@@ -104,6 +104,7 @@ fn transpose_cell(cell: Cell) -> Cell {
 }
 
 /// confirms that the letter before and after playspot is either empty or off the board.
+/// TODO this might be buggy
 fn is_not_subword(board: Board, playspot: Playspot) -> Bool {
   case list.first(playspot), list.last(playspot) {
     Ok(Cell(x1, y1) as c1), Ok(Cell(x2, y2) as c2) ->
