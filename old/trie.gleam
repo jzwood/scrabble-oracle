@@ -18,6 +18,7 @@ fn empty() -> Trie {
 }
 
 pub fn insert(trie: Trie, word: String) -> Trie {
+  // rewrite with case on list not string -- perf reasons
   case string.pop_grapheme(word) {
     Error(Nil) -> Trie(True, trie.children)
     Ok(#(char, tail)) ->

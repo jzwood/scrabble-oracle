@@ -175,6 +175,7 @@ fn score(
     })
   })
   |> option.map(fn(total) {
+    debug(word)
     let points = score_word(placement, board)
     #(word, playspot, total + points)
   })

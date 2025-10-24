@@ -133,7 +133,7 @@ pub fn parse_board(board: String) -> Result(Board, String) {
               "_" -> Square(None, None)
               char ->
                 Square(
-                  Some(Tile(string.lowercase(char), char_to_points(char))),
+                  Some(Tile(string.uppercase(char), char_to_points(char))),
                   None,
                 )
             })
@@ -212,6 +212,3 @@ pub fn pretty_print(board: Board) -> String {
 
   string.concat(["\n", cols, rows, cols])
 }
-//pub fn apply(board: Board, playspot: Playspot) -> Board {
-//todo
-//}

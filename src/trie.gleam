@@ -37,11 +37,15 @@ pub fn build(words: String) -> Trie {
 }
 
 pub fn member(trie: Trie, word: String) -> Bool {
-  case string.pop_grapheme(word) {
-    Error(Nil) -> trie.terminal
-    Ok(#(char, tail)) ->
+  member_inner(trie, string.to_graphemes(word))
+}
+
+fn member_inner(trie: Trie, word: List(Char)) -> Bool {
+  case word {
+    [] -> trie.terminal
+    [char, ..tail] ->
       case dict.get(trie.children, char) {
-        Ok(trie) -> member(trie, tail)
+        Ok(trie) -> member_inner(trie, tail)
         Error(Nil) -> False
       }
   }

@@ -1,5 +1,6 @@
 import gleeunit
 import trie
+import gleam/string
 import types.{Rack}
 
 const test_words = "
@@ -24,7 +25,7 @@ pub fn main() -> Nil {
   gleeunit.main()
 }
 
-pub fn main_test() {
+pub fn build_test() {
   let forward = trie.build(test_words)
   let cloze = [Ok("A"), Error(Nil), Ok("A"), Error(Nil), Error(Nil)]
   let rack = Rack(["C", "I", "S", "K"], 2)
@@ -53,4 +54,38 @@ pub fn main_test() {
   let cloze = [Error(Nil), Error(Nil), Error(Nil), Error(Nil), Error(Nil)]
   let rack = Rack(["A", "A", "R", "T", "I"], 0)
   assert ["AARTI"] == trie.explore(forward, cloze, rack)
+}
+
+pub fn member_test() {
+  let forward = trie.build(test_words)
+  assert trie.member(forward, "AA")
+  assert trie.member(forward, "AA")
+  assert trie.member(forward, "AAHED")
+  assert trie.member(forward, "AALII")
+  assert trie.member(forward, "AARGH")
+  assert trie.member(forward, "AARTI")
+  assert trie.member(forward, "ABACA")
+  assert trie.member(forward, "ABACI")
+  assert trie.member(forward, "ABACK")
+  assert trie.member(forward, "ABACS")
+  assert trie.member(forward, "ABAFT")
+  assert trie.member(forward, "ABAKA")
+  assert trie.member(forward, "ABAMP")
+  assert trie.member(forward, "ABAND")
+  assert trie.member(forward, "ABACKS")
+  assert trie.member(forward, "ABANDS")
+  assert False == trie.member(forward, string.reverse("AAHED"))
+  assert False == trie.member(forward, string.reverse("AALII"))
+  assert False == trie.member(forward, string.reverse("AARGH"))
+  assert False == trie.member(forward, string.reverse("AARTI"))
+  assert False == trie.member(forward, string.reverse("ABACA"))
+  assert False == trie.member(forward, string.reverse("ABACI"))
+  assert False == trie.member(forward, string.reverse("ABACK"))
+  assert False == trie.member(forward, string.reverse("ABACS"))
+  assert False == trie.member(forward, string.reverse("ABAFT"))
+  assert False == trie.member(forward, string.reverse("ABAKA"))
+  assert False == trie.member(forward, string.reverse("ABAMP"))
+  assert False == trie.member(forward, string.reverse("ABAND"))
+  assert False == trie.member(forward, string.reverse("ABACKS"))
+  assert False == trie.member(forward, string.reverse("ABANDS"))
 }
