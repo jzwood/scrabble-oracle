@@ -6,6 +6,7 @@ import gleam/option.{None, Some}
 import gleam/pair
 import gleam/result
 import gleam/set.{type Set}
+import gleam/io
 import gleam/string
 import io_extra.{debug}
 import list_extra
@@ -108,9 +109,9 @@ fn transpose_cell(cell: Cell) -> Cell {
 fn is_not_subword(board: Board, playspot: Playspot) -> Bool {
   case list.first(playspot), list.last(playspot) {
     Ok(Cell(x1, y1) as c1), Ok(Cell(x2, y2) as c2) ->
-      case x1 != x2, y1 != y2 {
-        True, False -> [Cell(x1 - 1, y1), Cell(x2 + 1, y2)]
-        False, True -> [Cell(x1, y1 - 1), Cell(x2, y2 + 2)]
+      case x1 == x2, y1 == y2 {
+        True, False -> [Cell(x1, y1 - 1), Cell(x2, y2 + 1)]
+        False, True -> [Cell(x1 - 1, y1), Cell(x2 + 1, y2)]
         _, _ ->
           panic as {
               "playspots must have 1 and only 1 axis. found "
