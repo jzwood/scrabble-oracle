@@ -189,8 +189,8 @@ fn flood(
   let Cell(x, y) = cell
   let cell = Cell(x + dx, y + dy)
   case dict.get(board, cell) {
-    Error(Nil) -> []
-    Ok(Square(None, _)) -> []
+    Error(Nil) -> acc
+    Ok(Square(None, _)) -> acc
     Ok(Square(Some(Tile(char, _)), _)) ->
       flood(cell, dx, dy, board, [#(char, cell), ..acc])
   }

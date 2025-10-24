@@ -40,7 +40,7 @@ const board = "
 const rack = "FEASTTH"
 
 // gleeunit test functions end in `_test`
-pub fn main_test_ignore() {
+pub fn main_test_test() {
   io.println("reading words: ongoing")
   let assert Ok(words) = read(from: words_path)
   io.println("reading words: done")

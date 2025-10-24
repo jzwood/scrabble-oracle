@@ -98,28 +98,28 @@ pub fn build_adjacent_cells_test() {
   let expected =
     "
    012345678901234
- 0 AAA_AAA_A__AAA_  0
- 1 ______A_A_A___A  1
- 2 __A_A_A_AAAA_A_  2
- 3 AAA_A_A____A_A_  3
- 4 A_____AAA_____A  4
- 5 _AAAA_A___AA_A_  5
- 6 A_AAA_A_AA_A_AA  6
- 7 ________A__A___  7
- 8 A_AAA_A_A__A__A  8
- 9 A_AAAAA_A___A_A  9
-10 _AA_____A___A_A 10
-11 _A___AAA____A_A 11
-12 _A_AA________A_ 12
-13 AA_A___________ 13
-14 ___A___________ 14
+ 0 XXX_XXX_X__XXX_  0
+ 1 ______X_X_X___X  1
+ 2 __X_X_X_XXXX_X_  2
+ 3 XXX_X_X____X_X_  3
+ 4 X_____XXX_____X  4
+ 5 _XXXX_X___XX_X_  5
+ 6 X_XXX_X_XX_X_XX  6
+ 7 ________X__X___  7
+ 8 X_XXX_X_X__X__X  8
+ 9 X_XXXXX_X___X_X  9
+10 _XX_____X___X_X 10
+11 _X___XXX____X_X 11
+12 _X_XX________X_ 12
+13 XX_X___________ 13
+14 ___X___________ 14
    012345678901234
 "
 
   let actual =
     board.build_adjacent_cells(board)
     |> set.to_list()
-    |> list.map(fn(cell) { #(cell, Square(Some(Tile("A", 0)), None)) })
+    |> list.map(fn(cell) { #(cell, Square(Some(Tile("X", 0)), None)) })
     |> dict.from_list
     |> board.pretty_print
 
