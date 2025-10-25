@@ -20,9 +20,6 @@ pub fn main() -> Nil {
 
 const words_path = "./assets/word_list.txt"
 
-//const words_path = "./assets/test_words.txt"
-const trie_dest = "./assets/trie.gleam"
-
 const board = "
   4__B___N___1__4
   JOULES_A___QAT_
@@ -35,33 +32,32 @@ const board = "
   _V1__G1G1___NO_
   _A___3_E_3___Z_
   ___NEXUS__2__E_
-  1_MAT__1___2_D_
+  1_MAT__1___2_D1
   __E___1_1___2__
   _2W__3___3___2_
   WAS1___4___1__4
   "
 
-const board2 = "
-    4__1___4___1__4
-    _2___3___3___2_
-    __2___1_1___2__
-    1__2___1___2__1
-    ____2_____2____
-    _3___3___3___3_
-    __1___1_1___1__
-    4__1__BA___1__4
-    __1___1_1___1__
-    _3___3___3___3_
-    ____2_____2____
-    1__2___1___2___
-    __2___1_1___2__
-    _2___3___3___2_
-    4__1___4___1__4
-    "
+//const board = "
+    //4__1___4___1__4
+    //_2___3___3___2_
+    //__2___1_1___2__
+    //1__2___1___2__1
+    //____2_____2____
+    //_3___3___3___3_
+    //__1___1_1___1__
+    //4__1__BA___1__4
+    //__1___1_1___1__
+    //_3___3___3___3_
+    //____2_____2____
+    //1__2___1___2___
+    //__2___1_1___2__
+    //_2___3___3___2_
+    //4__1___4___1__4
+    //"
 
-const rack = "FEASTTH"
-
-const rack2 = "HELLO"
+//const rack = "FEASTTH"
+const rack = "HELLO"
 
 // gleeunit test functions end in `_test`
 pub fn main_test() {
@@ -73,9 +69,9 @@ pub fn main_test() {
   let dict = trie.build(words)
   io.println("building dictionary: done")
 
-  let assert Ok(words) = scrabble.main(rack2, 0, board2, dict)
+  let assert Ok(words) = scrabble.main(rack, 0, board, dict)
 
-  let assert Ok(board) = board.parse_board(board2)
+  let assert Ok(board) = board.parse_board(board)
   board.pretty_print(board)
   |> io.println
 
@@ -87,7 +83,7 @@ pub fn main_test() {
   //|> io.println
 
   words
-  |> list.take(15)
+  |> list.take(50)
   |> list.map(fn(tup) {
     let #(word, playspots, points) = tup
     let assert [Cell(x1, y1), ..] = playspots
