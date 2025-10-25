@@ -1,6 +1,6 @@
+import gleam/string
 import gleeunit
 import trie
-import gleam/string
 import types.{Rack}
 
 const test_words = "

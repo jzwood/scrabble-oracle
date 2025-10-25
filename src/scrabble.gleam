@@ -1,12 +1,12 @@
 import board
 import gleam/dict
 import gleam/int
+import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
 import gleam/pair
 import gleam/result
 import gleam/set.{type Set}
-import gleam/io
 import gleam/string
 import io_extra.{debug}
 import list_extra
@@ -43,6 +43,12 @@ pub fn calculate_plays(
   dictionary: Trie,
 ) -> List(#(String, Playspot, Int)) {
   all_playspots(board, rack)
+  //|> list.filter(fn(spot) {
+  //case spot {
+  //[Cell(8, 7), Cell(8, 8), Cell(8, 9), Cell(8, 10), Cell(8, 11)] -> True
+  //_ -> False
+  //}
+  //})
   |> list_extra.map(get_cloze(board, _))
   |> list_extra.group(by: pair.first, transform: pair.second)
   |> dict.fold([], fn(acc, cloze: Cloze, playspots: List(Playspot)) {
@@ -229,7 +235,7 @@ fn score_word(word: List(#(Char, Cell)), board: Board) -> Int {
       let points = board.char_to_points(char)
       case dict.get(board, cell) {
         Error(Nil) -> panic as "every cell of board must have square"
-        Ok(Square(None, None)) -> #(points, multiplier, tiles + 1)
+        Ok(Square(None, None)) -> #(points + total, multiplier, tiles + 1)
         Ok(Square(None, Some(bonus))) ->
           case bonus {
             DoubleLetterScore -> #(points * 2 + total, multiplier, tiles + 1)
@@ -238,14 +244,14 @@ fn score_word(word: List(#(Char, Cell)), board: Board) -> Int {
             TripleWordScore -> #(points + total, 3 * multiplier, tiles + 1)
           }
         Ok(Square(Some(Tile(_, points)), _)) -> #(
-          total + points,
+          points + total,
           multiplier,
           tiles,
         )
       }
     })
 
-  debug(#( list.map(word, pair.first) |> string.concat, list.map(word, pair.second), total, multiplier), "A")
+  //debug(#( list.map(word, pair.first) |> string.concat, list.map(word, pair.second), total, multiplier), "A")
 
   total
   * multiplier
@@ -255,5 +261,5 @@ fn score_word(word: List(#(Char, Cell)), board: Board) -> Int {
       _ -> 0
     }
   }
-  |> debug("B")
+  //|> debug("B")
 }

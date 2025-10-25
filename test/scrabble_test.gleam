@@ -1,14 +1,14 @@
 import board
+import gleam/dict
 import gleam/int
 import gleam/io
 import gleam/list
+import gleam/option.{None, Some}
 import gleam/set
 import gleam/string
-import gleam/dict
 import gleeunit
 import io_extra.{debug}
 import scrabble
-import gleam/option.{Some, None}
 import types.{Cell, Square, Tile}
 
 import simplifile.{read, write}
@@ -41,9 +41,7 @@ const board = "
   WAS1___4___1__4
   "
 
-
-const board2 =
-    "
+const board2 = "
     4__1___4___1__4
     _2___3___3___2_
     __2___1_1___2__
@@ -62,6 +60,7 @@ const board2 =
     "
 
 const rack = "FEASTTH"
+
 const rack2 = "HELLO"
 
 // gleeunit test functions end in `_test`
@@ -88,7 +87,7 @@ pub fn main_test() {
   //|> io.println
 
   words
-  |> list.take(10)
+  |> list.take(15)
   |> list.map(fn(tup) {
     let #(word, playspots, points) = tup
     let assert [Cell(x1, y1), ..] = playspots

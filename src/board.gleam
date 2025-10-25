@@ -8,7 +8,7 @@ import gleam/string
 import list_extra
 
 import types.{
-  type Board, type Cell, type Char, type Playspot, type Rack, Cell,
+  type Board, type Bonus, type Cell, type Char, type Playspot, type Rack, Cell,
   DoubleLetterScore, DoubleWordScore, Rack, Square, Tile, TripleLetterScore,
   TripleWordScore,
 }
@@ -191,6 +191,15 @@ fn is_on_board(cell: Cell) -> Bool {
   0 <= x && x < board_size && 0 <= y && y < board_size
 }
 
+fn show_bonus(bonus: Bonus) -> String {
+  case bonus {
+    DoubleLetterScore -> "1"
+    DoubleWordScore -> "2"
+    TripleLetterScore -> "3"
+    TripleWordScore -> "4"
+  }
+}
+
 pub fn pretty_print(board: Board) -> String {
   let cols = "   012345678901234\n"
   let rows =
@@ -202,7 +211,8 @@ pub fn pretty_print(board: Board) -> String {
         |> list.map(fn(x) {
           case dict.get(board, Cell(x, y)) {
             Ok(Square(Some(Tile(char, _)), _)) -> char
-            Ok(Square(None, Some(_bonus))) -> "3" // change to be the correct code
+            Ok(Square(None, Some(bonus))) -> show_bonus(bonus)
+            // change to be the correct code
             _ -> "_"
           }
         })
