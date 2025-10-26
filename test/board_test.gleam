@@ -1,12 +1,9 @@
 import board
 import gleam/dict
-import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
 import gleam/set
-import gleam/string
 import gleeunit
-import io_extra.{debug}
 import types.{Rack, Square, Tile}
 
 const test_board = "

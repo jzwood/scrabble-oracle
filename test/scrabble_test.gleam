@@ -1,17 +1,13 @@
 import board
-import gleam/dict
 import gleam/int
 import gleam/io
 import gleam/list
-import gleam/option.{None, Some}
-import gleam/set
 import gleam/string
 import gleeunit
-import io_extra.{debug}
 import scrabble
-import types.{Cell, Square, Tile}
+import types.{Cell}
 
-import simplifile.{read, write}
+import simplifile.{read}
 import trie
 
 pub fn main() -> Nil {
@@ -39,25 +35,25 @@ const board = "
   "
 
 //const board = "
-    //4__1___4___1__4
-    //_2___3___3___2_
-    //__2___1_1___2__
-    //1__2___1___2__1
-    //____2_____2____
-    //_3___3___3___3_
-    //__1___1_1___1__
-    //4__1__BA___1__4
-    //__1___1_1___1__
-    //_3___3___3___3_
-    //____2_____2____
-    //1__2___1___2___
-    //__2___1_1___2__
-    //_2___3___3___2_
-    //4__1___4___1__4
-    //"
+//4__1___4___1__4
+//_2___3___3___2_
+//__2___1_1___2__
+//1__2___1___2__1
+//____2_____2____
+//_3___3___3___3_
+//__1___1_1___1__
+//4__1__BA___1__4
+//__1___1_1___1__
+//_3___3___3___3_
+//____2_____2____
+//1__2___1___2___
+//__2___1_1___2__
+//_2___3___3___2_
+//4__1___4___1__4
+//"
 
 //const rack = "FEASTTH"
-const rack = "HELLO"
+const rack = "STREAD"
 
 // gleeunit test functions end in `_test`
 pub fn main_test() {
@@ -83,7 +79,7 @@ pub fn main_test() {
   //|> io.println
 
   words
-  |> list.take(50)
+  |> list.take(20)
   |> list.map(fn(tup) {
     let #(word, playspots, points) = tup
     let assert [Cell(x1, y1), ..] = playspots

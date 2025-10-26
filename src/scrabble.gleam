@@ -1,14 +1,12 @@
 import board
 import gleam/dict
 import gleam/int
-import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
 import gleam/pair
 import gleam/result
-import gleam/set.{type Set}
+import gleam/set
 import gleam/string
-import io_extra.{debug}
 import list_extra
 import simplifile.{type FileError, read}
 import trie.{type Trie}

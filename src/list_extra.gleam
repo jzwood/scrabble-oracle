@@ -2,7 +2,6 @@ import gleam/dict.{type Dict}
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/order.{type Order, Eq, Gt, Lt}
-import gleam/string
 
 /// note: modified from gleam/list to include value transform
 pub fn group(
