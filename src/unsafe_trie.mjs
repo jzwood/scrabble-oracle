@@ -31,9 +31,12 @@ function insert(trie, word) {
   if (char == null) {
     trie.terminal = true;
   } else {
-    if (!hasKey(trie.children, char)) {
+    const child = trie.children.get(char);
+    if (child == null) {
       trie.children = updateMap(trie.children, char, empty());
+      insert(trie.children.get(char), tail);
+    } else {
+      insert(child, tail);
     }
-    insert(trie.children.get(char), tail);
   }
 }
