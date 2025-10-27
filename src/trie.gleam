@@ -1,6 +1,4 @@
 import gleam/dict.{type Dict}
-import gleam/dynamic.{type Dynamic}
-import gleam/dynamic/decode.{type Decoder}
 import gleam/list
 import gleam/option.{None, Some}
 import gleam/string
@@ -11,30 +9,8 @@ pub type Trie {
   Trie(terminal: Bool, children: Dict(Char, Trie))
 }
 
-@external(javascript, "./unsafe_trie.mjs", "buildDictionary")
-fn unsafe_build_dictionary(words: String) -> Dynamic
-
-fn decode_trie() -> Decoder(Trie) {
-  use <- decode.recursive
-  use terminal <- decode.field("terminal", decode.bool)
-  use children <- decode.field(
-    "children",
-    decode.dict(decode.string, decode_trie()),
-  )
-  decode.success(Trie(terminal, children))
-}
-
-pub fn build(words: String) -> Trie {
-  case decode.run(unsafe_build_dictionary(words), decode_trie()) {
-    Ok(dictionary) -> {
-      dictionary
-    }
-    Error(reasons) -> {
-      let errors = reasons |> string.inspect
-      panic as errors
-    }
-  }
-}
+@external(javascript, "./unsafe_trie.mjs", "build")
+pub fn build(words: String) -> Trie
 
 pub fn member(trie: Trie, word: String) -> Bool {
   member_inner(trie, string.to_graphemes(word))

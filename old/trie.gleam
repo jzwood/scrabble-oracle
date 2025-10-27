@@ -2,6 +2,15 @@ import gleam/dict
 import gleam/result
 import gleam/string
 
+pub type Char = String
+pub type Trie {
+  Trie(terminal: Bool, children: Dict(Char, Trie))
+}
+
+fn empty() -> Trie {
+  Trie(False, dict.new())
+}
+
 pub fn build_dictionary(words: List(String)) -> Dictionary {
   list.fold(words, Dictionary(empty(), empty()), fn(acc, word) {
     let Dictionary(forward, backward) = acc
@@ -13,15 +22,10 @@ pub fn build_dictionary(words: List(String)) -> Dictionary {
   })
 }
 
-fn empty() -> Trie {
-  Trie(False, dict.new())
-}
-
-pub fn insert(trie: Trie, word: String) -> Trie {
-  // rewrite with case on list not string -- perf reasons
-  case string.pop_grapheme(word) {
-    Error(Nil) -> Trie(True, trie.children)
-    Ok(#(char, tail)) ->
+pub fn insert(trie: Trie, word: List(Char)) -> Trie {
+  case word {
+    [] -> Trie(True, trie.children)
+    [char, ..tails] ->
       dict.get(trie.children, char)
       |> result.unwrap(empty())
       |> insert(tail)
@@ -29,3 +33,21 @@ pub fn insert(trie: Trie, word: String) -> Trie {
       |> Trie(trie.terminal, _)
   }
 }
+
+pub fn insert(trie: Trie, word: List(Char)) -> Trie {
+  case word {
+    [] -> Trie(True, trie.children)
+    [char, ..tail] -> {
+      Trie(
+        trie.terminal,
+        dict.upsert(trie.children, char, fn(maybe_trie) {
+          case maybe_trie {
+            None -> insert(empty(), tail)
+            Some(trie) -> insert(trie, tail)
+          }
+        }),
+      )
+    }
+  }
+}
+
