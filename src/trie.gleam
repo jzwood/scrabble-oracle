@@ -1,6 +1,7 @@
 import gleam/dict.{type Dict}
 import gleam/list
 import gleam/option.{None, Some}
+import gleam/result
 import gleam/string
 import list_extra
 import types.{type Char, type Cloze, type Rack, Rack}
@@ -10,7 +11,33 @@ pub type Trie {
 }
 
 @external(javascript, "./unsafe_trie.mjs", "build")
-pub fn build(words: String) -> Trie
+pub fn build(words: String) -> Trie {
+  words
+  |> string.trim()
+  |> string.split("\n")
+  |> list.fold(empty(), insert)
+}
+
+fn empty() -> Trie {
+  Trie(False, dict.new())
+}
+
+fn insert(trie: Trie, word: String) -> Trie {
+  case string.pop_grapheme(word) {
+    Error(Nil) -> Trie(True, trie.children)
+    Ok(#(char, tail)) ->
+      Trie(
+        trie.terminal,
+        dict.insert(
+          trie.children,
+          char,
+          dict.get(trie.children, char)
+            |> result.unwrap(empty())
+            |> insert(tail),
+        ),
+      )
+  }
+}
 
 pub fn member(trie: Trie, word: String) -> Bool {
   case string.pop_grapheme(word) {

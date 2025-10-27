@@ -13,6 +13,7 @@ version = "1.0.0"
 # https://gleam.run/writing-gleam/gleam-toml/.
 
 target = "javascript"
+#target = "erlang"
 
 #[javascript]
 #runtime = "deno"
