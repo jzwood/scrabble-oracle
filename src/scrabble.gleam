@@ -118,11 +118,11 @@ fn is_not_subword(board: Board, playspot: Playspot) -> Bool {
         False, True -> [Cell(x1 - 1, y1), Cell(x2 + 1, y2)]
         _, _ ->
           panic as {
-              "playspots must have 1 and only 1 axis. found "
-              <> string.inspect(c1)
-              <> " "
-              <> string.inspect(c2)
-            }
+            "playspots must have 1 and only 1 axis. found "
+            <> string.inspect(c1)
+            <> " "
+            <> string.inspect(c2)
+          }
       }
     _, _ -> panic as "impossible zero length playspot"
   }

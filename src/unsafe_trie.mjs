@@ -21,11 +21,6 @@ export function build(words) {
   return trie;
 }
 
-function inspect(x, label) {
-  console.log(label, x);
-  return x;
-}
-
 function insert(trie, word) {
   const [char, ...tail] = word;
   if (char == null) {

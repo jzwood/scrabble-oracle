@@ -2,7 +2,9 @@ import gleam/dict
 import gleam/result
 import gleam/string
 
-pub type Char = String
+pub type Char =
+  String
+
 pub type Trie {
   Trie(terminal: Bool, children: Dict(Char, Trie))
 }
@@ -50,4 +52,3 @@ pub fn insert(trie: Trie, word: List(Char)) -> Trie {
     }
   }
 }
-

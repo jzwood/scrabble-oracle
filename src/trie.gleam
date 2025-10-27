@@ -13,15 +13,11 @@ pub type Trie {
 pub fn build(words: String) -> Trie
 
 pub fn member(trie: Trie, word: String) -> Bool {
-  member_inner(trie, string.to_graphemes(word))
-}
-
-fn member_inner(trie: Trie, word: List(Char)) -> Bool {
-  case word {
-    [] -> trie.terminal
-    [char, ..tail] ->
+  case string.pop_grapheme(word) {
+    Error(Nil) -> trie.terminal
+    Ok(#(char, tail)) ->
       case dict.get(trie.children, char) {
-        Ok(trie) -> member_inner(trie, tail)
+        Ok(trie) -> member(trie, tail)
         Error(Nil) -> False
       }
   }
