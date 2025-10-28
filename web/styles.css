@@ -16,3 +16,10 @@ html, body {
 textarea {
   resize: none;
 }
+
+canvas {
+  width: 100%;
+  max-width: 90vh;
+  margin: 0 auto;
+  display: block;
+}
