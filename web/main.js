@@ -57,10 +57,23 @@ function main() {
   let currentContext = null;
 
   function stopProcessing() {
-    if (id) {
-      clearInterval(id);
-      id = null;
+    clearInterval(id);
+    id = null;
+    if (currentVideo) {
+      if (currentVideo.srcObject instanceof MediaStream) {
+        const stream = currentVideo.srcObject;
+        const tracks = stream.getTracks();
+        tracks.forEach((track) => track.stop());
+      }
+      currentVideo.srcObject = null;
+      currentVideo.pause();
     }
+    if (currentContext) {
+      currentContext.clearRect(0, 0, SIDE, SIDE);
+      currentContext.reset();
+    }
+    currentVideo = null;
+    currentContext = null;
   }
 
   document.getElementById("start")
@@ -82,6 +95,8 @@ function main() {
           loading = false;
         });
     });
+
+  document.getElementById("stop").addEventListener("click", stopProcessing);
 
   window.addEventListener("beforeunload", stopProcessing);
 }
