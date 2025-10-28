@@ -53,22 +53,37 @@ function ready(fn) {
 function main() {
   let id = null;
   let loading = false;
+  let currentVideo = null;
+  let currentContext = null;
+
+  function stopProcessing() {
+    if (id) {
+      clearInterval(id);
+      id = null;
+    }
+  }
+
   document.getElementById("start")
     .addEventListener("click", () => {
-      if (loading) return null;
+      if (loading) return;
+      stopProcessing();
       loading = true;
       getVideo()
         .then(({ video, context }) => {
-          clearInterval(id);
+          currentVideo = video;
+          currentContext = context;
           id = setInterval(() => processFrame({ video, context }), 100);
         })
         .catch((err) => {
           console.error(err);
+          stopProcessing();
         })
         .finally(() => {
           loading = false;
         });
     });
+
+  window.addEventListener("beforeunload", stopProcessing);
 }
 
 ready(main);

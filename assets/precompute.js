@@ -12,12 +12,14 @@ words.split("\n").forEach((word) => {
 function insert(trie, word) {
   const [char, ...tail] = word;
   if (!char) return trie;
-  const terminal = tail.length === 0
+  const terminal = tail.length === 0;
   if (!trie[char]) {
     trie[char] = {};
   }
-  trie[char].terminal ||= terminal
+  trie[char].terminal ||= terminal;
   insert(trie[char], tail);
 }
 
-await Deno.writeTextFile("assets/words.json", JSON.stringify(trie), { encoding: "utf8" });
+await Deno.writeTextFile("assets/words.json", JSON.stringify(trie), {
+  encoding: "utf8",
+});
