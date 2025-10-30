@@ -1,13 +1,27 @@
+@import 'theme.css';
+
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
 }
 
-#board {
+/*
+*/
+
+.body {
+  padding: 0.75rem;
   max-width: 90vh;
   margin: 0 auto;
-  padding: 0.75rem;
+}
+
+@media (width <= 500px) {
+  .body {
+    padding: 0;
+  }
+}
+
+#board {
   display: grid;
   grid-template-columns: repeat(15, 1fr);
   grid-auto-rows: 1fr;
@@ -15,18 +29,18 @@ html, body {
 
   & div {
     aspect-ratio: 1/1;
-    background-color: #d0d6b5;
+    background-color: var(--board-color);
     &.cell-1 {
-      background-color: #9dbf9e;
+      background-color: var(--double-letter-color);
     }
     &.cell-2 {
-      background-color: #f9b5ac;
+      background-color: var(--triple-letter-color);
     }
     &.cell-3 {
-      background-color: #ee7674;
+      background-color: var(--double-word-color);
     }
     &.cell-4 {
-      background-color: #987284;
+      background-color: var(--triple-word-color);
     }
   }
 }

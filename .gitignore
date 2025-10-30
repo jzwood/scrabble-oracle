@@ -3,5 +3,5 @@
 /build
 erl_crash.dump
 experiment/*
-secrets/*
+secrets/*.pem
 .DS_Store

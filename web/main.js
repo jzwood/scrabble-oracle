@@ -1,10 +1,11 @@
 import { raw_board } from "../build/dev/javascript/scrabble/board.mjs";
 
-function onReady(fn) {
+(function(fn) {
   document.readyState !== "loading"
     ? fn()
     : document.addEventListener("DOMContentLoaded", fn);
-}
+})(main)
+
 function main() {
   const board = document.getElementById("board");
   const chars = raw_board.replace(/\s/g, "");
@@ -17,4 +18,3 @@ function main() {
   console.log(board);
 }
 
-onReady(main);
