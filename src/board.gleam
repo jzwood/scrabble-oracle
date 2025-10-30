@@ -12,9 +12,7 @@ import types.{
 }
 
 const board_size = 15
-
-pub fn init() -> Board {
-  let board: String =
+pub const raw_board =
     "
     4__1___4___1__4
     _2___3___3___2_
@@ -33,7 +31,8 @@ pub fn init() -> Board {
     4__1___4___1__4
     "
 
-  let assert Ok(board) = parse_board(board)
+pub fn init() -> Board {
+  let assert Ok(board) = parse_board(raw_board)
 
   board
 }
