@@ -1,10 +1,10 @@
 import { raw_board } from "../build/dev/javascript/scrabble/board.mjs";
 
-(function(fn) {
+(function (fn) {
   document.readyState !== "loading"
     ? fn()
     : document.addEventListener("DOMContentLoaded", fn);
-})(main)
+})(main);
 
 function main() {
   const board = document.getElementById("board");
@@ -17,4 +17,3 @@ function main() {
 
   console.log(board);
 }
-

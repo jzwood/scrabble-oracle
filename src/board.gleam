@@ -12,8 +12,8 @@ import types.{
 }
 
 const board_size = 15
-pub const raw_board =
-    "
+
+pub const raw_board = "
     4__1___4___1__4
     _2___3___3___2_
     __2___1_1___2__
