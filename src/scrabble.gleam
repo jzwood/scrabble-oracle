@@ -4,11 +4,9 @@ import gleam/int
 import gleam/list
 import gleam/option.{None, Some}
 import gleam/pair
-import gleam/result
 import gleam/set
 import gleam/string
 import list_extra
-import simplifile.{type FileError, read}
 import trie.{type Trie}
 import types.{
   type Board, type Cell, type Char, type Cloze, type Playspot, type Rack, Cell,
@@ -30,23 +28,12 @@ pub fn main(
   }
 }
 
-pub fn precompute_dictionary(words_path: String) -> Result(Trie, FileError) {
-  read(words_path)
-  |> result.map(trie.build)
-}
-
 pub fn calculate_plays(
   board: Board,
   rack: Rack,
   dictionary: Trie,
 ) -> List(#(String, Playspot, Int)) {
   all_playspots(board, rack)
-  //|> list.filter(fn(spot) {
-  //case spot {
-  //[Cell(8, 7), Cell(8, 8), Cell(8, 9), Cell(8, 10), Cell(8, 11)] -> True
-  //_ -> False
-  //}
-  //})
   |> list_extra.map(get_cloze(board, _))
   |> list_extra.group(by: pair.first, transform: pair.second)
   |> dict.fold([], fn(acc, cloze: Cloze, playspots: List(Playspot)) {
@@ -249,8 +236,6 @@ fn score_word(word: List(#(Char, Cell)), board: Board) -> Int {
       }
     })
 
-  //debug(#( list.map(word, pair.first) |> string.concat, list.map(word, pair.second), total, multiplier), "A")
-
   total
   * multiplier
   + {
@@ -259,5 +244,4 @@ fn score_word(word: List(#(Char, Cell)), board: Board) -> Int {
       _ -> 0
     }
   }
-  //|> debug("B")
 }
