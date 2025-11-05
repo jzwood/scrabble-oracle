@@ -22,11 +22,22 @@ async function main() {
     for (let char of chars) {
       const cell = document.createElement("div");
       cell.className = `cell cell-${char} flex-center f6`;
+      cell.dataset.bonus = char;
       cell.setAttribute("contenteditable", "plaintext-only");
       cell.addEventListener("input", (e) => {
         const elem = e.target;
         elem.textContent = capitalize(elem.textContent).slice(0, 1);
         if (elem.textContent.length > 0) elem.nextSibling.focus();
+      });
+      cell.addEventListener("keydown", (e) => {
+        const elem = e.target;
+        const isBackspace = e.key === "Backspace";
+        const isEmpty = elem.textContent.length === 0;
+        if (isBackspace && isEmpty) {
+          elem.previousSibling.focus();
+        } else if (isBackspace && !isEmpty) {
+          elem.textContent = "";
+        }
       });
       board.appendChild(cell);
     }
