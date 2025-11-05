@@ -1,6 +1,5 @@
 import { raw_board } from "../build/dev/javascript/scrabble/board.mjs";
 import * as scrabble from "../build/dev/javascript/scrabble/scrabble.mjs";
-import * as trie from "../build/dev/javascript/scrabble/trie.mjs";
 
 (function (fn) {
   document.readyState !== "loading"
@@ -12,9 +11,31 @@ function capitalize(value) {
   return value.toUpperCase().replace(/[^A-Z]/g, "");
 }
 
+// WIP
+async function getDictionary() {
+  const KEY = "SCRABBLE_DICTIONARY";
+  let dictionary = localStorage.getItem(KEY);
+  if (dictionary) {
+    console.info("DICTIONARY FETCHED FROM CACHE");
+    return JSON.parse(dictionary);
+  }
+  const words = await fetch("assets/word_list.txt").then((res) => res.text());
+  dictionary = trie.build(words);
+  localStorage.clear();
+  localStorage.setItem(KEY, JSON.stringify(dictionary));
+  console.info("DICTIONARY CACHED");
+  return dictionary;
+}
+
 async function main() {
   try {
     // TODO: start loading UI
+    let trie;
+    const worker = new Worker("assets/worker.js", { type: "module" });
+    worker.onmessage = ({ data }) => {
+      console.log("TRIE", data);
+      trie = data;
+    };
 
     // CREATE BOARD
     const board = document.getElementById("board");
@@ -60,8 +81,9 @@ async function main() {
       });
 
     // FETCH WORDS & BUILD DICTIONARY
-    const words = await fetch("assets/word_list.txt").then((res) => res.text());
-    const dictionary = trie.build(words);
+    //const words = await fetch("assets/word_list.txt").then((res) => res.text());
+    //const dictionary = trie.build(words);
+    //const dictionary = await getDictionary();
 
     // TODO: end loading UI
   } catch (err) {
