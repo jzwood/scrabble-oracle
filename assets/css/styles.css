@@ -15,22 +15,29 @@ html, body {
   display: grid;
   grid-template-columns: repeat(15, 1fr);
   grid-auto-rows: 1fr;
-  gap: 1px 1px;
+  gap: 2px 2px;
 
   & div {
     aspect-ratio: 1/1;
     background-color: var(--board-color);
+    &.cell {
+      caret-color: transparent;
+    }
     &.cell-1 {
       background-color: var(--double-letter-color);
+      /* &::after { content: "2L"; } */
     }
     &.cell-2 {
-      background-color: var(--triple-letter-color);
+      background-color: var(--double-word-color);
+      /* &::after { content: "2W"; } */
     }
     &.cell-3 {
-      background-color: var(--double-word-color);
+      background-color: var(--triple-letter-color);
+      /* &::after { content: "3L"; } */
     }
     &.cell-4 {
       background-color: var(--triple-word-color);
+      /* &::after { content: "3W"; } */
     }
   }
 }
