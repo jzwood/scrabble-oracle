@@ -11,31 +11,16 @@ function capitalize(value) {
   return value.toUpperCase().replace(/[^A-Z]/g, "");
 }
 
-// WIP
-async function getDictionary() {
-  const KEY = "SCRABBLE_DICTIONARY";
-  let dictionary = localStorage.getItem(KEY);
-  if (dictionary) {
-    console.info("DICTIONARY FETCHED FROM CACHE");
-    return JSON.parse(dictionary);
-  }
-  const words = await fetch("assets/word_list.txt").then((res) => res.text());
-  dictionary = trie.build(words);
-  localStorage.clear();
-  localStorage.setItem(KEY, JSON.stringify(dictionary));
-  console.info("DICTIONARY CACHED");
-  return dictionary;
-}
-
 async function main() {
   try {
     // TODO: start loading UI
-    let trie;
+    let dictionary;
     const worker = new Worker("assets/worker.js", { type: "module" });
     worker.onmessage = ({ data }) => {
-      console.log("TRIE", data);
-      trie = data;
+      dictionary = data;
     };
+    let rack = "";
+    let blanks = 0;
 
     // CREATE BOARD
     const board = document.getElementById("board");
@@ -63,8 +48,15 @@ async function main() {
       board.appendChild(cell);
     }
 
-    let rack = "";
-    let blanks = 0;
+    function calculate() {
+      if (rack.length === 0 || dictionary == null) return null;
+      const boardStr = Array.from(board.children)
+        .map((cell) => cell.textContent || "_")
+        .join("");
+      console.log(rack, blanks, boardStr, dictionary)
+      //const results = scrabble.main(rack, blanks, boardStr, dictionary);
+      //console.log(results);
+    }
 
     // INIT RACK
     document
@@ -72,18 +64,15 @@ async function main() {
       .addEventListener("input", (e) => {
         rack = capitalize(e.target.value);
         e.target.value = rack;
+        calculate();
       });
 
     document
       .getElementById("blanks")
       .addEventListener("change", (e) => {
         blanks = parseInt(e.target.selectedOptions[0].value, 10);
+        calculate();
       });
-
-    // FETCH WORDS & BUILD DICTIONARY
-    //const words = await fetch("assets/word_list.txt").then((res) => res.text());
-    //const dictionary = trie.build(words);
-    //const dictionary = await getDictionary();
 
     // TODO: end loading UI
   } catch (err) {
