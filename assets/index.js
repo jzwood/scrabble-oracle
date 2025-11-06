@@ -1,3 +1,4 @@
+import * as trie from "../build/dev/javascript/scrabble/trie.mjs";
 import { raw_board } from "../build/dev/javascript/scrabble/board.mjs";
 import * as scrabble from "../build/dev/javascript/scrabble/scrabble.mjs";
 
@@ -11,16 +12,17 @@ function capitalize(value) {
   return value.toUpperCase().replace(/[^A-Z]/g, "");
 }
 
+async function getDictionary() {
+  // IT'S WORTH CACHING THE WORDS IN SESSION STORAGE
+  const WORDS_FPATH = "/assets/word_list.txt";
+  const words = await fetch(WORDS_FPATH)
+    .then((res) => res.text());
+  return trie.build(words);
+}
+
 async function main() {
   try {
     // TODO: start loading UI
-    let dictionary;
-    const worker = new Worker("assets/worker.js", { type: "module" });
-    worker.onmessage = ({ data }) => {
-      dictionary = data;
-    };
-    let rack = "";
-    let blanks = 0;
 
     // CREATE BOARD
     const board = document.getElementById("board");
@@ -48,14 +50,18 @@ async function main() {
       board.appendChild(cell);
     }
 
+    const dictionary = await getDictionary();
+    let rack = "";
+    let blanks = 0;
+
     function calculate() {
       if (rack.length === 0 || dictionary == null) return null;
       const boardStr = Array.from(board.children)
         .map((cell) => cell.textContent || "_")
         .join("");
-      console.log(rack, blanks, boardStr, dictionary)
-      //const results = scrabble.main(rack, blanks, boardStr, dictionary);
-      //console.log(results);
+      console.log(rack, blanks, boardStr, dictionary);
+      const results = scrabble.main(rack, blanks, boardStr, dictionary);
+      console.log(results);
     }
 
     // INIT RACK
