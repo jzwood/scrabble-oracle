@@ -14,21 +14,22 @@ function capitalize(value) {
   return value.toUpperCase().replace(/[^A-Z]/g, "");
 }
 
-async function getDictionary() {
-  // IT'S WORTH CACHING THE WORDS IN SESSION STORAGE
-  const WORDS_FPATH = "/assets/word_list.txt";
-  const words = await fetch(WORDS_FPATH)
-    .then((res) => res.text());
-  return trie.build(words);
-}
-
 async function main() {
   try {
     // TODO: start loading UI
 
+    const results = [];
+    const worker = new Worker("assets/worker.js", { type: "module" });
+    worker.onmessage = ({ data }) => {
+      results = data.results;
+    };
+
     // CREATE BOARD
     const board = document.getElementById("board");
+    const blanks = document.getElementById("blanks");
+    const rack = document.getElementById("rack");
     const output = document.getElementById("output");
+
     const chars = raw_board.replace(/\s/g, "");
     for (let char of chars) {
       const cell = document.createElement("div");
@@ -53,47 +54,34 @@ async function main() {
       board.appendChild(cell);
     }
 
-    const dictionary = await getDictionary();
-    let rack = "";
-    let blanks = 0;
-
-    function calculate() {
-      if (rack.length === 0 || dictionary == null) return null;
+    const calculate = debounce(() => {
+      const blanksInt = parseInt(blanks.selectedOptions[0].value, 10);
+      const rackStr = rack.value;
       const boardStr = Array.from(board.children)
         .map((cell) => cell.textContent || "_")
         .join("");
-      const results = unwrap(
-        scrabble.main(rack, blanks, boardStr, dictionary),
-        new Empty(),
-      )
-        .toArray()
-        .map(([word, playspot, score]) => [word, playspot.toArray(), score]);
-
-      output.textContent = "";
-      results.forEach(([word, playspot, score]) => {
-        output.textContent += `${word}  ${score}\n`;
-      });
-      console.log(results);
-    }
+      worker.postMessage({ board: boardStr, rack: rackStr, blanks: blanksInt });
+    }, 500);
 
     // INIT RACK
-    document
-      .getElementById("rack")
-      .addEventListener("input", (e) => {
-        rack = capitalize(e.target.value);
-        e.target.value = rack;
-        calculate();
-      });
-
-    document
-      .getElementById("blanks")
-      .addEventListener("change", (e) => {
-        blanks = parseInt(e.target.selectedOptions[0].value, 10);
-        calculate();
-      });
+    racks.addEventListener("input", (e) => {
+      e.target.value = capitalize(e.target.value);
+      calculate();
+    });
+    blanks.addEventListener("change", calculate)
 
     // TODO: end loading UI
   } catch (err) {
     console.error(err);
   }
+}
+
+function debounce(func, delay) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
 }
