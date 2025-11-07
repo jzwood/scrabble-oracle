@@ -28,6 +28,7 @@ async function main() {
 
     // CREATE BOARD
     const board = document.getElementById("board");
+    const output = document.getElementById("output");
     const chars = raw_board.replace(/\s/g, "");
     for (let char of chars) {
       const cell = document.createElement("div");
@@ -67,6 +68,11 @@ async function main() {
       )
         .toArray()
         .map(([word, playspot, score]) => [word, playspot.toArray(), score]);
+
+      output.textContent = "";
+      results.forEach(([word, playspot, score]) => {
+        output.textContent += `${word}  ${score}\n`;
+      });
       console.log(results);
     }
 
