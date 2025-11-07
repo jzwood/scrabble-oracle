@@ -30,20 +30,25 @@
   <body>
     <div class="body mh-auto pa0 pa3-m">
       <div id="board"></div>
-      <div class="flex gh2 f4 pt2 ph3 ph0-m items-center ttl">
-        <label for="rack">Rack</label>
-        <input
-          id="rack"
-          type="text"
-          name="rack"
-          class="ttu ba b--black"
-        />
-        <label for="blanks">Blanks</label>
-        <select id="blanks" name="blanks" class="ba b--black bg-white">
-          <option value="0">0</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-        </select>
+      <div class="flex flex-wrap gh2 gv1 f4 pt2 ph2 ph0-m items-center ttl">
+        <div>
+          <label for="rack">Rack</label>
+          <input
+            id="rack"
+            type="text"
+            name="rack"
+            class="ttu ba b--black"
+            size="7"
+          />
+        </div>
+        <div>
+          <label for="blanks">Blanks</label>
+          <select id="blanks" name="blanks" class="ba b--black bg-white">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+        </div>
       </div>
       <output id="output"></output>
     </div>
