@@ -41,3 +41,25 @@ html, body {
     }
   }
 }
+
+/* HTML: <div class="loader"></div> */
+.loader {
+  display: inline-flex;
+}
+.loader::after {
+  content: "LOREMI PSUMDO LORSIT AMETCO NSECTE TURADI PISCIN GELITS EDDOEI USMODT EMPORI NCIDID UNTUTL ABOREE TDOLOR EMAGNA ALIQUA UTENIM ADMINI MVENIA MQUISN OSTRUD EXERCI TATION ULLAMC OLABOR ISNISI UTALIQ UIPEXE ACOMMO DOCONS EQUATD UISAUT EIRURE DOLORI NREPRE HENDER ITINVO LUPTAT EVELIT ESSECI LLUMDO LOREEU FUGIAT NULLAP ARIATU REXCEP TEURSI NTOCCA ECATCU PIDATA TNONPR OIDENT SUNTIN CULPAQ UIOFFI CIADES ERUNTM OLLITA NIMIDE STLABO";
+  font-size: 1.25rem;
+  font-family: monospace;
+  line-height: 1em;
+  height: 1em;
+  width: 6ch;
+  color: #0000;
+  text-shadow: 0 0 0 #000;
+  overflow: hidden;
+  animation: loading 1s steps(20) infinite;
+}
+@keyframes loading {
+  100% {
+    text-shadow: 0 -20em 0 #000;
+  }
+}

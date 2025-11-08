@@ -1,6 +1,7 @@
+import * as scrabble from "../build/dev/javascript/scrabble/scrabble.mjs";
 import * as trie from "../build/dev/javascript/scrabble/trie.mjs";
-import { unwrap } from "../build/dev/javascript/gleam_stdlib/gleam/result.mjs";
 import { Empty } from "../build/dev/javascript/prelude.mjs";
+import { unwrap } from "../build/dev/javascript/gleam_stdlib/gleam/result.mjs";
 
 const WORDS_FPATH = "./word_list.txt";
 
@@ -14,14 +15,15 @@ fetch(WORDS_FPATH)
   });
 
 onmessage = ({ data }) => {
-  if (dictionary == null) return null;
-  console.log("DATA", data);
-  //if (data.rack.length === 0) return null;
-  //const result = calculate(data.rack, data.board, dictionary);
-  //postMessage(result);
+  if (dictionary == null) {
+    postMessage([]);
+  } else {
+    const result = calculate(data, dictionary);
+    postMessage(result);
+  }
 };
 
-function calculate(rack, blanks, board, dictionary) {
+function calculate({ rack, blanks, board }, dictionary) {
   const result = scrabble.main(rack, blanks, board, dictionary);
   return unwrap(result, new Empty())
     .toArray()
