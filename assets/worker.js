@@ -4,6 +4,7 @@ import { Empty } from "../build/dev/javascript/prelude.mjs";
 import { unwrap } from "../build/dev/javascript/gleam_stdlib/gleam/result.mjs";
 
 const WORDS_FPATH = "./word_list.txt";
+const LIMIT = 25;
 
 let dictionary;
 
@@ -27,5 +28,6 @@ function calculate({ rack, blanks, board }, dictionary) {
   const result = scrabble.main(rack, blanks, board, dictionary);
   return unwrap(result, new Empty())
     .toArray()
+    .slice(0, LIMIT)
     .map(([word, playspot, score]) => [word, playspot.toArray(), score]);
 }

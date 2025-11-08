@@ -59,7 +59,14 @@ function updateResults(results) {
   const output = document.getElementById("output");
   const lis = results.map(([word, playspot, score]) => {
     const li = document.createElement("li");
-    li.textContent = `${word} ${score}`;
+    li.className = "dc f4";
+    const span1 = document.createElement("span");
+    span1.textContent = score;
+    span1.className = "tr";
+    const span2 = document.createElement("span");
+    span2.textContent = word;
+    span1.className = "tr";
+    li.replaceChildren(span1, span2);
     return li;
   });
   output.replaceChildren(...lis);
@@ -100,7 +107,7 @@ async function main() {
     }, 500);
 
     rack.addEventListener("input", (e) => {
-      e.target.value = capitalize(e.target.value);
+      e.target.value = capitalize(e.target.value).slice(0, 7);
       calculate();
     });
     blanks.addEventListener("change", calculate);

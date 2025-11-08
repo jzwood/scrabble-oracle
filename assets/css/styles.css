@@ -11,36 +11,6 @@ html, body {
   max-width: 90vh;
 }
 
-@media (width < 400px) {
-  #output {
-    columns: 1;
-  }
-}
-
-@media (400px <= width < 500px) {
-  #output {
-    columns: 2;
-  }
-}
-
-@media (500px <= width < 600px) {
-  #output {
-    columns: 3;
-  }
-}
-
-@media (600px <= width < 700px) {
-  #output {
-    columns: 4;
-  }
-}
-
-@media (700px <= width) {
-  #output {
-    columns: 5;
-  }
-}
-
 #board {
   display: grid;
   grid-template-columns: repeat(15, 1fr);
