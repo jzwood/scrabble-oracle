@@ -27,7 +27,8 @@ function loading(action) {
   }
 }
 
-function initBoard(board) {
+function initBoard() {
+  const board = document.getElementById("board");
   const chars = raw_board.replace(/\s/g, "");
   for (let char of chars) {
     const cell = document.createElement("div");
@@ -54,22 +55,32 @@ function initBoard(board) {
   }
 }
 
+function updateResults(results) {
+  const output = document.getElementById("output");
+  const lis = results.map(([word, playspot, score]) => {
+    const li = document.createElement("li");
+    li.textContent = `${word} ${score}`;
+    return li;
+  });
+  output.replaceChildren(...lis);
+}
+
 async function main() {
   try {
     const worker = new Worker("assets/worker.js", { type: "module" });
     worker.onmessage = ({ data }) => {
-      console.log(data);
+      updateResults(data);
       loading(LOADER.STOP);
     };
 
-    // CREATE BOARD
+    const body = document.querySelector(".body");
     const board = document.getElementById("board");
     const blanks = document.getElementById("blanks");
     const rack = document.getElementById("rack");
-    const output = document.getElementById("output");
 
-    initBoard(board);
+    initBoard();
     loading(LOADER.START);
+    body.classList.remove("hidden");
 
     const calculate = debounce(() => {
       const rackStr = rack.value;
@@ -88,7 +99,6 @@ async function main() {
       }
     }, 500);
 
-    // INIT RACK
     rack.addEventListener("input", (e) => {
       e.target.value = capitalize(e.target.value);
       calculate();

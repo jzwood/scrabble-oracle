@@ -28,9 +28,9 @@
     <title>scrabble oracle</title>
   </head>
   <body>
-    <div class="body mh-auto pa0 pa3-m">
+    <div class="body mh-auto pa0 pa3-m hidden">
       <div id="board"></div>
-      <div class="flex flex-wrap gh2 gv1 f4 pt2 ph2 ph0-m items-center ttl">
+      <div class="flex flex-wrap gh2 gv1 f4 pv2 ph2 ph0-m items-center ttl">
         <div>
           <label for="rack">Rack</label>
           <input
@@ -51,7 +51,7 @@
         </div>
         <div id="loader" class="ttu"></div>
       </div>
-      <div id="output" class="pre pa2"></div>
+      <ul id="output" class="list-no mt3 ph2 ph0-m"></ul>
     </div>
     <script defer type="module" src="assets/index.js"></script>
   </body>
