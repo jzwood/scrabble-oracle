@@ -22,6 +22,9 @@ html, body {
     background-color: var(--board-color);
     &.cell {
       caret-color: transparent;
+      &:focus {
+        outline: 2px solid blue;
+      }
     }
     &.cell-1 {
       background-color: var(--double-letter-color);

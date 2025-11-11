@@ -44,48 +44,59 @@ function focus(elem, forward) {
   return elem;
 }
 
+function resetTabindex(normal) {
+  const board = document.getElementById("board");
+  Array.from(board.children).forEach((cell, index) => {
+    cell.setAttribute("tabindex", tabindex(index, normal));
+  });
+}
+
+function tabindex(index, normal) {
+  const width = 15;
+  return 1 +
+    (normal ? index : Math.floor(index / width) + width * (index % width));
+}
+
 function initBoard() {
   const board = document.getElementById("board");
   const chars = raw_board.replace(/\s/g, "");
-  let prevFocus;
+  let active;
 
-  for (let char of chars) {
+  Array.from(chars).forEach((char, index) => {
     const cell = document.createElement("div");
     cell.className = `cell cell-${char} flex-center f4 f6-m`;
-    cell.dataset.bonus = char;
-    cell.setAttribute("contenteditable", "plaintext-only");
-    cell.addEventListener("input", (e) => {
-      cell.textContent = capitalize(cell.textContent).slice(0, 1);
-      if (cell.textContent.length > 0) {
-        prevFocus = focus(cell, true);
-      } else {
-        prevFocus = cell;
-      }
-    });
-
+    cell.setAttribute("tabindex", tabindex(index, false));
     cell.addEventListener("keydown", (e) => {
-      const isBackspace = e.key === "Backspace";
-      const isEmpty = cell.textContent.length === 0;
-      if (isBackspace && isEmpty) {
-        prevFocus = focus(cell, false);
-      } else if (isBackspace && !isEmpty) {
-        cell.textContent = "";
-        prevFocus = cell;
+      const key = e.key;
+      if (/^[a-zA-Z]$/.test(key)) {
+        cell.textContent = capitalize(key);
+        active = focus(cell, true);
       } else {
-        prevFocus = cell;
+        active = cell;
       }
+      //const isBackspace = e.key === "Backspace";
+      //const isEmpty = cell.textContent.length === 0;
+      //if (isBackspace && isEmpty) {
+      //active = focus(cell, false);
+      //} else if (isBackspace && !isEmpty) {
+      //cell.textContent = "";
+      //active = cell;
+      //} else {
+      //active = cell;
+      //}
     });
 
     cell.addEventListener("click", (e) => {
-      if (prevFocus === cell) {
+      cell.focus();
+      if (active === cell) {
         document.body.classList.toggle("direction-down");
       } else {
-        prevFocus = cell;
+        active = cell;
       }
     });
 
     board.appendChild(cell);
-  }
+  });
 }
 
 function updateResults(results) {
