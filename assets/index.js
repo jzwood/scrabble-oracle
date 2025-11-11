@@ -27,30 +27,63 @@ function loading(action) {
   }
 }
 
+function focus(elem, forward) {
+  const isDown = document.body.classList.contains("direction-down");
+  let sibling = elem;
+  if (isDown) {
+    for (let i = 0; i < 15; i++) {
+      sibling = forward ? sibling?.nextSibling : sibling?.previousSibling;
+    }
+  } else {
+    sibling = forward ? elem?.nextSibling : elem?.previousSibling;
+  }
+  if (sibling) {
+    sibling.focus();
+    return sibling;
+  }
+  return elem;
+}
+
 function initBoard() {
   const board = document.getElementById("board");
   const chars = raw_board.replace(/\s/g, "");
+  let prevFocus;
+
   for (let char of chars) {
     const cell = document.createElement("div");
     cell.className = `cell cell-${char} flex-center f4 f6-m`;
     cell.dataset.bonus = char;
     cell.setAttribute("contenteditable", "plaintext-only");
     cell.addEventListener("input", (e) => {
-      const elem = e.target;
-      elem.textContent = capitalize(elem.textContent).slice(0, 1);
-      if (elem.textContent.length > 0) elem.nextSibling.focus();
+      cell.textContent = capitalize(cell.textContent).slice(0, 1);
+      if (cell.textContent.length > 0) {
+        prevFocus = focus(cell, true);
+      } else {
+        prevFocus = cell;
+      }
     });
 
     cell.addEventListener("keydown", (e) => {
-      const elem = e.target;
       const isBackspace = e.key === "Backspace";
-      const isEmpty = elem.textContent.length === 0;
+      const isEmpty = cell.textContent.length === 0;
       if (isBackspace && isEmpty) {
-        elem.previousSibling.focus();
+        prevFocus = focus(cell, false);
       } else if (isBackspace && !isEmpty) {
-        elem.textContent = "";
+        cell.textContent = "";
+        prevFocus = cell;
+      } else {
+        prevFocus = cell;
       }
     });
+
+    cell.addEventListener("click", (e) => {
+      if (prevFocus === cell) {
+        document.body.classList.toggle("direction-down");
+      } else {
+        prevFocus = cell;
+      }
+    });
+
     board.appendChild(cell);
   }
 }
@@ -66,7 +99,7 @@ function updateResults(results) {
     const span2 = document.createElement("span");
     span2.textContent = word;
     span1.className = "tr";
-    li.replaceChildren(span1, span2);
+    li.append(span1, span2);
     return li;
   });
   output.replaceChildren(...lis);

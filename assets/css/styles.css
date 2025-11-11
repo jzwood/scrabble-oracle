@@ -42,6 +42,30 @@ html, body {
   }
 }
 
+body:not(.direction-down) .cell:focus + .cell::before {
+  content: "▸";
+}
+
+body.direction-down
+  .cell:focus
+  + .cell
+  + .cell
+  + .cell
+  + .cell
+  + .cell
+  + .cell
+  + .cell
+  + .cell
+  + .cell
+  + .cell
+  + .cell
+  + .cell
+  + .cell
+  + .cell
+  + .cell::before {
+  content: "▾";
+}
+
 /* HTML: <div class="loader"></div> */
 .loader {
   display: inline-flex;
