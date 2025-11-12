@@ -152,6 +152,15 @@ async function main() {
       }
     }, 500);
 
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState == "hidden") {
+        // TODO
+      }
+      if (document.visibilityState == "visible") {
+        // TODO
+      }
+    });
+
     rack.addEventListener("input", (e) => {
       e.target.value = capitalize(e.target.value).slice(0, 7);
       calculate();
