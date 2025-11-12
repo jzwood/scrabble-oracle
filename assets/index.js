@@ -1,4 +1,4 @@
-import { raw_board } from "../build/dev/javascript/scrabble/board.mjs";
+import { raw_board } from "../build/dev/javascript/scrabble/board.mjs?v=B5B8D809-1B7E-45A4-8C08-991E9C53093F";
 
 const LOADER = {
   START: Symbol("start"),
