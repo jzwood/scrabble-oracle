@@ -27,9 +27,9 @@ function isDirectionDown() {
   return document.body.classList.contains(DIRECTION_DOWN_CLASS);
 }
 
-function focus(elem, forward) {
+function focus(elem, forward, down = isDirectionDown()) {
   let sibling = elem;
-  if (isDirectionDown()) {
+  if (down) {
     for (let i = 0; i < 15; i++) {
       sibling = forward ? sibling?.nextSibling : sibling?.previousSibling;
     }
@@ -59,36 +59,41 @@ function tabindex(index, down) {
 function initBoard() {
   const board = document.getElementById("board");
   const chars = raw_board.replace(/\s/g, "");
-  let active;
 
   Array.from(chars).forEach((char, index) => {
     const cell = document.createElement("div");
     cell.className = `cell cell-${char} flex-center f4 f6-m overflow-hidden`;
     cell.setAttribute("tabindex", tabindex(index, false));
+    cell.setAttribute("contenteditable", "plaintext-only");
+    cell.addEventListener("input", (e) => {
+      cell.textContent = capitalize(cell.textContent).slice(0, 1);
+      if (cell.textContent.length > 0) {
+        focus(cell, true);
+      }
+    });
     cell.addEventListener("keydown", (e) => {
       const key = e.key;
       const isBackspace = key === "Backspace";
       const isEmpty = cell.textContent.length === 0;
       if (/^[a-zA-Z]$/.test(key)) {
-        cell.textContent = capitalize(key);
-        active = focus(cell, true);
+        // DO NOTHING
       } else if (isBackspace && isEmpty) {
-        active = focus(cell, false);
+        focus(cell, false);
       } else if (isBackspace && !isEmpty) {
-        active = cell;
         cell.textContent = "";
-      } else {
-        active = cell;
-      }
-    });
-
-    cell.addEventListener("click", (e) => {
-      cell.focus();
-      if (active === cell) {
+      } else if (key === "Enter" || /^[0-9]$/.test(key)) {
         document.body.classList.toggle(DIRECTION_DOWN_CLASS);
         resetTabindex();
+      } else if (key === "ArrowUp") {
+        focus(cell, false, true);
+      } else if (key === "ArrowRight") {
+        focus(cell, true, false);
+      } else if (key === "ArrowDown") {
+        focus(cell, true, true);
+      } else if (key === "ArrowLeft") {
+        focus(cell, false, false);
       } else {
-        active = cell;
+        // DO NOTHING
       }
     });
 
