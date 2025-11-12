@@ -5,11 +5,7 @@ const LOADER = {
   STOP: Symbol("stop"),
 };
 
-(function (fn) {
-  document.readyState !== "loading"
-    ? fn()
-    : document.addEventListener("DOMContentLoaded", fn);
-})(main);
+const DIRECTION_DOWN_CLASS = "direction-down";
 
 function capitalize(value) {
   return value.toUpperCase().replace(/[^A-Z]/g, "");
@@ -27,10 +23,13 @@ function loading(action) {
   }
 }
 
+function isDirectionDown() {
+  return document.body.classList.contains(DIRECTION_DOWN_CLASS);
+}
+
 function focus(elem, forward) {
-  const isDown = document.body.classList.contains("direction-down");
   let sibling = elem;
-  if (isDown) {
+  if (isDirectionDown()) {
     for (let i = 0; i < 15; i++) {
       sibling = forward ? sibling?.nextSibling : sibling?.previousSibling;
     }
@@ -44,17 +43,17 @@ function focus(elem, forward) {
   return elem;
 }
 
-function resetTabindex(normal) {
+function resetTabindex() {
   const board = document.getElementById("board");
   Array.from(board.children).forEach((cell, index) => {
-    cell.setAttribute("tabindex", tabindex(index, normal));
+    cell.setAttribute("tabindex", tabindex(index, isDirectionDown()));
   });
 }
 
-function tabindex(index, normal) {
+function tabindex(index, down) {
   const width = 15;
   return 1 +
-    (normal ? index : Math.floor(index / width) + width * (index % width));
+    (down ? Math.floor(index / width) + width * (index % width) : index);
 }
 
 function initBoard() {
@@ -64,32 +63,30 @@ function initBoard() {
 
   Array.from(chars).forEach((char, index) => {
     const cell = document.createElement("div");
-    cell.className = `cell cell-${char} flex-center f4 f6-m`;
+    cell.className = `cell cell-${char} flex-center f4 f6-m overflow-hidden`;
     cell.setAttribute("tabindex", tabindex(index, false));
     cell.addEventListener("keydown", (e) => {
       const key = e.key;
+      const isBackspace = key === "Backspace";
+      const isEmpty = cell.textContent.length === 0;
       if (/^[a-zA-Z]$/.test(key)) {
         cell.textContent = capitalize(key);
         active = focus(cell, true);
+      } else if (isBackspace && isEmpty) {
+        active = focus(cell, false);
+      } else if (isBackspace && !isEmpty) {
+        active = cell;
+        cell.textContent = "";
       } else {
         active = cell;
       }
-      //const isBackspace = e.key === "Backspace";
-      //const isEmpty = cell.textContent.length === 0;
-      //if (isBackspace && isEmpty) {
-      //active = focus(cell, false);
-      //} else if (isBackspace && !isEmpty) {
-      //cell.textContent = "";
-      //active = cell;
-      //} else {
-      //active = cell;
-      //}
     });
 
     cell.addEventListener("click", (e) => {
       cell.focus();
       if (active === cell) {
-        document.body.classList.toggle("direction-down");
+        document.body.classList.toggle(DIRECTION_DOWN_CLASS);
+        resetTabindex();
       } else {
         active = cell;
       }
@@ -171,3 +168,10 @@ function debounce(func, delay) {
     }, delay);
   };
 }
+
+// MAIN
+(function (fn) {
+  document.readyState !== "loading"
+    ? fn()
+    : document.addEventListener("DOMContentLoaded", fn);
+})(main);

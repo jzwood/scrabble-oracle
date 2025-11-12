@@ -32,7 +32,7 @@
       <div id="board"></div>
       <div class="flex flex-wrap gh2 gv1 f4 pv2 ph2 ph0-m items-center ttl">
         <div>
-          <label for="rack">Rack</label>
+          <label for="rack">rack</label>
           <input
             id="rack"
             type="text"
@@ -41,17 +41,29 @@
             size="7"
           />
         </div>
-        <div class="flex-grow-1">
-          <label for="blanks">Blanks</label>
+        <div>
+          <label for="blanks">blanks</label>
           <select id="blanks" name="blanks" class="ba b--black bg-white">
             <option value="0">0</option>
             <option value="1">1</option>
             <option value="2">2</option>
           </select>
         </div>
+        <div class="flex-grow-1"></div>
         <div id="loader" class="ttu"></div>
+        <button popovertarget="about" class="f4">about</button>
       </div>
       <ul id="output" class="list-no mt3 mb1 ph2 ph0-m grid icols-2 gh2"></ul>
+    </div>
+    <div popover id="about" class="pa3">
+      <h4>scrabble oracle</h4>
+      <p>
+        recreate your scrabble board and input your rack to see the highest
+        scoring options available to you.
+      </p>
+      <p>
+        double-tap square to change input direction.
+      </p>
     </div>
     <script defer type="module" src="assets/index.js"></script>
   </body>
