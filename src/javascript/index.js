@@ -1,60 +1,15 @@
-import { raw_board } from "../build/dev/javascript/scrabble/board.mjs?v=B5B8D809-1B7E-45A4-8C08-991E9C53093F";
-
-const LOADER = {
-  START: Symbol("start"),
-  STOP: Symbol("stop"),
-};
-
-const DIRECTION_DOWN_CLASS = "direction-down";
-
-function capitalize(value) {
-  return value.toUpperCase().replace(/[^A-Z]/g, "");
-}
-
-function loading(action) {
-  const loader = document.getElementById("loader");
-  switch (action) {
-    case LOADER.START:
-      loader.classList.add("loader");
-      break;
-    case LOADER.STOP:
-      loader.classList.remove("loader");
-      break;
-  }
-}
-
-function isDirectionDown() {
-  return document.body.classList.contains(DIRECTION_DOWN_CLASS);
-}
-
-function focus(elem, forward, down = isDirectionDown()) {
-  let sibling = elem;
-  if (down) {
-    for (let i = 0; i < 15; i++) {
-      sibling = forward ? sibling?.nextSibling : sibling?.previousSibling;
-    }
-  } else {
-    sibling = forward ? elem?.nextSibling : elem?.previousSibling;
-  }
-  if (sibling) {
-    sibling.focus();
-    return sibling;
-  }
-  return elem;
-}
-
-function resetTabindex() {
-  const board = document.getElementById("board");
-  Array.from(board.children).forEach((cell, index) => {
-    cell.setAttribute("tabindex", tabindex(index, isDirectionDown()));
-  });
-}
-
-function tabindex(index, down) {
-  const width = 15;
-  return 1 +
-    (down ? Math.floor(index / width) + width * (index % width) : index);
-}
+import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=6C95A4BA-68C1-459C-8E76-0F8C762224F3";
+import {
+  capitalize,
+  debounce,
+  DIRECTION_DOWN_CLASS,
+  focus,
+  isDirectionDown,
+  LOADER,
+  loading,
+  resetTabindex,
+  tabindex,
+} from "./utils.js?v=9789C975-F1A1-47DE-AD83-A2BBBAE5C380";
 
 function initBoard() {
   const board = document.getElementById("board");
@@ -120,7 +75,7 @@ function updateResults(results) {
 
 async function main() {
   try {
-    const worker = new Worker("assets/worker.js", { type: "module" });
+    const worker = new Worker("src/javascript/worker.js", { type: "module" });
     worker.onmessage = ({ data }) => {
       updateResults(data);
       loading(LOADER.STOP);
@@ -171,16 +126,6 @@ async function main() {
   } catch (err) {
     console.error(err);
   }
-}
-
-function debounce(func, delay) {
-  let timeout;
-  return function (...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-      func.apply(this, args);
-    }, delay);
-  };
 }
 
 // MAIN
