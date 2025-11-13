@@ -8,6 +8,8 @@ import {
   LOADER,
   loading,
   resetTabindex,
+  restoreBoard,
+  saveBoard,
   tabindex,
 } from "./utils.js?v=9789C975-F1A1-47DE-AD83-A2BBBAE5C380";
 
@@ -80,6 +82,9 @@ async function main() {
       updateResults(data);
       loading(LOADER.STOP);
     };
+    worker.onerror = (err) => {
+      console.error(err);
+    };
 
     const body = document.querySelector(".body");
     const board = document.getElementById("board");
@@ -87,6 +92,7 @@ async function main() {
     const rack = document.getElementById("rack");
 
     initBoard();
+    restoreBoard();
     loading(LOADER.START);
     body.classList.remove("hidden");
 
@@ -109,10 +115,7 @@ async function main() {
 
     document.addEventListener("visibilitychange", function () {
       if (document.visibilityState == "hidden") {
-        // TODO
-      }
-      if (document.visibilityState == "visible") {
-        // TODO
+        saveBoard();
       }
     });
 

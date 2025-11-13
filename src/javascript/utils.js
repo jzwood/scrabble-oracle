@@ -62,3 +62,23 @@ export function debounce(func, delay) {
 export function capitalize(value) {
   return value.toUpperCase().replace(/[^A-Z]/g, "");
 }
+
+export function saveBoard() {
+  const board = document.getElementById("board");
+  const state = Array.from(board.children).map((cell) =>
+    cell.textContent || "_"
+  ).join("");
+  sessionStorage.setItem("board", state);
+}
+
+export function restoreBoard() {
+  const board = document.getElementById("board");
+  const state = sessionStorage.getItem("board");
+  if (state) {
+    Array.from(state).forEach((char, index) => {
+      if (/^[a-zA-Z]$/.test(char)) {
+        board.children[index].textContent = char;
+      }
+    });
+  }
+}
