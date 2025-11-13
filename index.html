@@ -33,31 +33,37 @@
   <body>
     <div class="body mh-auto pa0 pa3-m hidden">
       <div id="board"></div>
-      <div class="flex flex-wrap gh2 gv1 f4 pv2 ph2 ph0-m items-center ttl">
-        <div>
-          <label for="rack">rack</label>
-          <input
-            id="rack"
-            type="text"
-            name="rack"
-            class="ttu ba b--black"
-            size="7"
-          />
+      <div class="flex-between gh2 f4 pv2 ph2 ph0-m ttl">
+        <div class="flex flex-wrap gh2 gv1 items-center">
+          <div>
+            <label for="rack">rack</label>
+            <input
+              id="rack"
+              type="text"
+              name="rack"
+              class="ttu ba b--black"
+              size="7"
+            />
+          </div>
+          <div>
+            <label for="blanks">blanks</label>
+            <select id="blanks" name="blanks" class="ba b--black bg-white">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+            </select>
+          </div>
+          <button>
+            clear board
+          </button>
         </div>
-        <div>
-          <label for="blanks">blanks</label>
-          <select id="blanks" name="blanks" class="ba b--black bg-white">
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-          </select>
-        </div>
-        <div class="flex-grow-1"></div>
-        <div id="loader" class="ttu"></div>
+        <div id="loader" class="ttu self-baseline"></div>
       </div>
-      <button popovertarget="about" class="f4 fixed right-1 bottom-1">
-        about
-      </button>
+      <div class="f4 fixed flex gh2 right-1 bottom-1">
+        <button popovertarget="about">
+          about
+        </button>
+      </div>
       <ul id="output" class="list-no mt3 mb1 ph2 ph0-m grid icols-2 gh2"></ul>
     </div>
     <div popover id="about" class="pa3">
