@@ -1,6 +1,7 @@
-import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=6C95A4BA-68C1-459C-8E76-0F8C762224F3";
+import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=FD2439FF-9855-453E-B86F-F1CC3B30B57C";
 import {
   capitalize,
+  clearBoard,
   debounce,
   DIRECTION_DOWN_CLASS,
   focus,
@@ -11,7 +12,7 @@ import {
   restoreBoard,
   saveBoard,
   tabindex,
-} from "./utils.js?v=9789C975-F1A1-47DE-AD83-A2BBBAE5C380";
+} from "./utils.js?v=FD2439FF-9855-453E-B86F-F1CC3B30B57C";
 
 function initBoard() {
   const board = document.getElementById("board");
@@ -90,6 +91,7 @@ async function main() {
     const board = document.getElementById("board");
     const blanks = document.getElementById("blanks");
     const rack = document.getElementById("rack");
+    //const clear = document.getElementById("clear");
 
     initBoard();
     restoreBoard();
@@ -114,6 +116,7 @@ async function main() {
     }, 500);
 
     document.addEventListener("visibilitychange", function () {
+      // THEORETICALLY WILL BE CALLED WHEN TAB IS REFRESHED
       if (document.visibilityState == "hidden") {
         saveBoard();
       }
@@ -124,6 +127,8 @@ async function main() {
       calculate();
     });
     blanks.addEventListener("change", calculate);
+
+    //clear.addEventListener("click", clearBoard);
 
     loading(LOADER.STOP);
   } catch (err) {

@@ -8,7 +8,7 @@
     />
     <link
       rel="stylesheet"
-      href="src/css/styles.css?v=EE39A2D9-7A59-4D99-AD65-B78D0A944A7C"
+      href="src/css/styles.css?v=756840A0-29DE-4B1D-AF89-57C063BE1B27"
     >
     <link rel="stylesheet" href="static/css/tachyons-field.min.css">
     <link
@@ -33,15 +33,15 @@
   <body>
     <div class="body mh-auto pa0 pa3-m hidden">
       <div id="board"></div>
-      <div class="flex-between gh2 f4 pv2 ph2 ph0-m ttl">
-        <div class="flex flex-wrap gh2 gv1 items-center">
+      <div class="flex-between gh2 gv1 f4 pv2 ph2 ph0-m ttl">
+        <div class="flex flex-wrap items-center ga2">
           <div>
             <label for="rack">rack</label>
             <input
               id="rack"
               type="text"
               name="rack"
-              class="ttu ba b--black"
+              class="ttu ba b--black ph1"
               size="7"
             />
           </div>
@@ -53,13 +53,16 @@
               <option value="2">2</option>
             </select>
           </div>
-          <button>
-            clear board
-          </button>
         </div>
-        <div id="loader" class="ttu self-baseline"></div>
+        <select id="menu" class="ba b--black bg-white self-baseline">
+          <option value="1">menu</option>
+          <option value="1">help</option>
+          <option value="0">clear board</option>
+          <option value="1">activate key</option>
+        </select>
       </div>
-      <div class="f4 fixed flex gh2 right-1 bottom-1">
+      <div class="f4 fixed flex items-center gh2 right-1 bottom-1">
+        <div id="loader" class="ttu"></div>
         <button popovertarget="about">
           about
         </button>
@@ -79,7 +82,7 @@
     <script
       defer
       type="module"
-      src="src/javascript/index.js?v=EE39A2D9-7A59-4D99-AD65-B78D0A944A7C"
+      src="src/javascript/index.js?v=756840A0-29DE-4B1D-AF89-57C063BE1B27"
     ></script>
   </body>
 </html>

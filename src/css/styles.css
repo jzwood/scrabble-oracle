@@ -1,4 +1,4 @@
-@import "theme.css?v=AD833934-4599-44FB-85DC-31E3264CCDF7";
+@import "theme.css?v=6575E509-5ECC-46CA-B6FE-05125DDA5C2B";
 
 html, body {
   margin: 0;
@@ -17,6 +17,14 @@ button {
 
 select, button {
   cursor: pointer;
+}
+
+select, input {
+  height: 2rem;
+}
+
+#rack {
+  font-family: monospace;
 }
 
 #board {

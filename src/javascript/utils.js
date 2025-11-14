@@ -82,3 +82,10 @@ export function restoreBoard() {
     });
   }
 }
+
+export function clearBoard() {
+  const board = document.getElementById("board");
+  for (let cell of board.children) {
+    cell.textContent = "";
+  }
+}
