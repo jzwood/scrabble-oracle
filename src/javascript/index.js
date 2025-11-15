@@ -22,6 +22,8 @@ function initBoard() {
     const cell = document.createElement("div");
     cell.className = `cell cell-${char} flex-center f4 f6-m overflow-hidden`;
     cell.setAttribute("tabindex", tabindex(index, false));
+    cell.dataset.bonus = char;
+    cell.setAttribute("tabindex", tabindex(index, false));
     cell.setAttribute("contenteditable", "plaintext-only");
     cell.addEventListener("input", (e) => {
       cell.textContent = capitalize(cell.textContent).slice(0, 1);
@@ -64,13 +66,13 @@ function updateResults(results) {
   const lis = results.map(([word, playspot, score]) => {
     const li = document.createElement("li");
     li.className = "dc f4";
-    const span1 = document.createElement("span");
-    span1.textContent = score;
-    span1.className = "tr";
-    const span2 = document.createElement("span");
-    span2.textContent = word;
-    span1.className = "tr";
-    li.append(span1, span2);
+    const scoreSpan = document.createElement("span");
+    scoreSpan.textContent = score;
+    scoreSpan.className = "tr";
+    const wordSpan = document.createElement("span");
+    wordSpan.textContent = word.toUpperCase();
+    scoreSpan.className = "tr";
+    li.append(scoreSpan, wordSpan);
     return li;
   });
   output.replaceChildren(...lis);
@@ -103,7 +105,7 @@ async function main() {
       if (rackStr.length > 0) {
         const blanksInt = parseInt(blanks.selectedOptions[0].value, 10);
         const boardStr = Array.from(board.children)
-          .map((cell) => cell.textContent || "_")
+          .map((cell) => cell.textContent.trim() || cell.dataset.bonus)
           .join("");
 
         worker.postMessage({
@@ -129,7 +131,9 @@ async function main() {
     blanks.addEventListener("change", calculate);
 
     //clear.addEventListener("click", clearBoard);
-
+    if (rack.value.length > 0) {
+      calculate();
+    }
     loading(LOADER.STOP);
   } catch (err) {
     console.error(err);

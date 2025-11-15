@@ -96,7 +96,7 @@ fn explore_inner(
               None if rack.num_blanks > 0 ->
                 Ok(
                   #(trie, cloze, Rack(rack.chars, rack.num_blanks - 1), [
-                    key,
+                    string.lowercase(key),
                     ..trail
                   ]),
                 )
