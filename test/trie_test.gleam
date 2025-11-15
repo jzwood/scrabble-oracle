@@ -1,3 +1,4 @@
+import gleam/list
 import gleam/string
 import gleeunit
 import trie
@@ -31,10 +32,11 @@ pub fn build_test() {
   let rack = Rack(["C", "I", "S", "K"], 2)
 
   assert ["ABACA", "ABACI", "ABACK", "ABACS", "ABAKA"]
-    == trie.explore(forward, cloze, rack)
+    == trie.explore(forward, cloze, rack) |> list.map(string.uppercase)
 
   let rack = Rack(["C", "I", "S", "K"], 1)
-  assert ["ABACI", "ABACK", "ABACS"] == trie.explore(forward, cloze, rack)
+  assert ["ABACI", "ABACK", "ABACS"]
+    == trie.explore(forward, cloze, rack) |> list.map(string.uppercase)
 
   let rack = Rack(["B", "C", "I", "S", "K"], 0)
   assert ["ABACI", "ABACK", "ABACS"] == trie.explore(forward, cloze, rack)

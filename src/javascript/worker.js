@@ -1,7 +1,7 @@
-import * as scrabble from "../../build/dev/javascript/scrabble/scrabble.mjs";
-import * as trie from "../../build/dev/javascript/scrabble/trie.mjs";
-import { Empty } from "../../build/dev/javascript/prelude.mjs";
-import { unwrap } from "../../build/dev/javascript/gleam_stdlib/gleam/result.mjs";
+import * as scrabble from "../../build/dev/javascript/scrabble/scrabble.mjs?v=D8FBF86A-2980-4FBF-BBBF-87673A55010A";
+import * as trie from "../../build/dev/javascript/scrabble/trie.mjs?v=D8FBF86A-2980-4FBF-BBBF-87673A55010A";
+import { Empty } from "../../build/dev/javascript/prelude.mjs?v=D8FBF86A-2980-4FBF-BBBF-87673A55010A";
+import { unwrap } from "../../build/dev/javascript/gleam_stdlib/gleam/result.mjs?v=D8FBF86A-2980-4FBF-BBBF-87673A55010A";
 
 const WORDS_FPATH = "../../static/text/word_list.txt";
 const LIMIT = 25;
