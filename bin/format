@@ -2,5 +2,5 @@
 
 gleam format src
 deno fmt index.html
-deno fmt src/javascript/*.js
-deno fmt src/css/*.css
+deno fmt web/javascript/*.js
+deno fmt web/css/*.css

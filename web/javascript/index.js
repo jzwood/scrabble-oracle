@@ -1,4 +1,4 @@
-import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=6C5C6AC8-4E16-4CCD-9894-336F4E40B7DD";
+import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs";
 import {
   capitalize,
   clearBoard,
@@ -12,7 +12,7 @@ import {
   restoreBoard,
   saveBoard,
   tabindex,
-} from "./utils.js?v=6C5C6AC8-4E16-4CCD-9894-336F4E40B7DD";
+} from "./utils.js";
 
 function initBoard() {
   const board = document.getElementById("board");
@@ -80,7 +80,7 @@ function updateResults(results) {
 
 async function main() {
   try {
-    const worker = new Worker("src/javascript/worker.js", { type: "module" });
+    const worker = new Worker("web/javascript/worker.js", { type: "module" });
     worker.onmessage = ({ data }) => {
       updateResults(data);
       loading(LOADER.STOP);
