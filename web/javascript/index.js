@@ -93,7 +93,8 @@ async function main() {
     const board = document.getElementById("board");
     const blanks = document.getElementById("blanks");
     const rack = document.getElementById("rack");
-    //const clear = document.getElementById("clear");
+    const menu = document.getElementById("menu");
+    const help = document.getElementById("help");
 
     initBoard();
     restoreBoard();
@@ -130,10 +131,32 @@ async function main() {
     });
     blanks.addEventListener("change", calculate);
 
-    //clear.addEventListener("click", clearBoard);
+    menu.addEventListener("change", (e) => {
+      e.preventDefault();
+      const value = e.target.value;
+      setTimeout(() => {
+        menu.value = "menu";
+      }, 500);
+      switch (value) {
+        case "menu":
+          break;
+        case "help":
+          help.togglePopover();
+          break;
+        case "clear":
+          clearBoard();
+          break;
+        case "activate":
+          break;
+        default:
+          break;
+      }
+    });
+
     if (rack.value.length > 0) {
       calculate();
     }
+
     loading(LOADER.STOP);
   } catch (err) {
     console.error(err);
