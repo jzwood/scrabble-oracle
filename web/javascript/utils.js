@@ -3,6 +3,7 @@ export const LOADER = {
   START: Symbol("start"),
   STOP: Symbol("stop"),
 };
+export const WIDTH = 15;
 
 export function loading(action) {
   const loader = document.getElementById("loader");
@@ -23,7 +24,7 @@ export function isDirectionDown() {
 export function focus(elem, forward, down = isDirectionDown()) {
   let sibling = elem;
   if (down) {
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < WIDTH; i++) {
       sibling = forward ? sibling?.nextSibling : sibling?.previousSibling;
     }
   } else {
@@ -44,9 +45,8 @@ export function resetTabindex() {
 }
 
 export function tabindex(index, down) {
-  const width = 15;
   return 1 +
-    (down ? Math.floor(index / width) + width * (index % width) : index);
+    (down ? Math.floor(index / WIDTH) + WIDTH * (index % WIDTH) : index);
 }
 
 export function debounce(func, delay) {

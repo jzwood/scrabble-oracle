@@ -12,6 +12,7 @@ import {
   restoreBoard,
   saveBoard,
   tabindex,
+  WIDTH,
 } from "./utils.js";
 
 function initBoard() {
@@ -62,6 +63,13 @@ function initBoard() {
 }
 
 function showPlayspot(playspot) {
+  const board = document.getElementById("board");
+  for (let cell of board.children) {
+    cell.classList.remove("active");
+  }
+  playspot.forEach(({ x, y }) => {
+    board.children[y * WIDTH + x].classList.add("active");
+  });
 }
 
 function updateResults(results) {

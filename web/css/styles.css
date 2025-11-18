@@ -33,15 +33,10 @@ select, input {
   grid-auto-rows: 1fr;
   gap: 2px 2px;
 
-  & div {
+  & .cell {
     aspect-ratio: 1/1;
     background-color: var(--board-color);
-    &.cell {
-      caret-color: transparent;
-      &:focus {
-        outline: 2px solid blue;
-      }
-    }
+    caret-color: transparent;
     &.cell-1 {
       background-color: var(--double-letter-color);
       /* &::after { content: "2L"; } */
@@ -57,6 +52,12 @@ select, input {
     &.cell-4 {
       background-color: var(--triple-word-color);
       /* &::after { content: "3W"; } */
+    }
+    &.active {
+      background-color: #a6d1d6;
+    }
+    &:focus {
+      outline: 2px solid blue;
     }
   }
 }
