@@ -61,6 +61,9 @@ function initBoard() {
   });
 }
 
+function showPlayspot(playspot) {
+}
+
 function updateResults(results) {
   const output = document.getElementById("output");
   const lis = results.map(([word, playspot, score]) => {
@@ -69,10 +72,13 @@ function updateResults(results) {
     const scoreSpan = document.createElement("span");
     scoreSpan.textContent = score;
     scoreSpan.className = "tr";
-    const wordSpan = document.createElement("span");
-    wordSpan.textContent = word.toUpperCase();
-    scoreSpan.className = "tr";
-    li.append(scoreSpan, wordSpan);
+    const wordButton = document.createElement("button");
+    wordButton.textContent = word.toUpperCase();
+    wordButton.className = "bw0 tl";
+    wordButton.addEventListener("click", () => {
+      showPlayspot(playspot);
+    });
+    li.append(scoreSpan, wordButton);
     return li;
   });
   output.replaceChildren(...lis);
@@ -101,6 +107,10 @@ async function main() {
     loading(LOADER.START);
     body.classList.remove("hidden");
 
+    //const onPopoverClose = event => {
+    //if (event.newState === 'closed') {}
+    //}
+
     const calculate = debounce(() => {
       const rackStr = rack.value;
       if (rackStr.length > 0) {
@@ -124,7 +134,7 @@ async function main() {
         saveBoard();
       }
     });
-
+    //help.addEventListener('toggle', event => onPopoverClose());
     rack.addEventListener("input", (e) => {
       e.target.value = capitalize(e.target.value).slice(0, 7);
       calculate();
@@ -134,9 +144,7 @@ async function main() {
     menu.addEventListener("change", (e) => {
       e.preventDefault();
       const value = e.target.value;
-      setTimeout(() => {
-        menu.value = "menu";
-      }, 500);
+      menu.value = "menu";
       switch (value) {
         case "menu":
           break;
@@ -145,6 +153,7 @@ async function main() {
           break;
         case "clear":
           clearBoard();
+          menu.value = "menu";
           break;
         case "activate":
           break;
