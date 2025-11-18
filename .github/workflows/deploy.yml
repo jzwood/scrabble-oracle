@@ -21,6 +21,7 @@ jobs:
       - run: gleam test
       - run: gleam format --check src test
       - run: gleam build --warnings-as-errors
+      - run: bash bin/bump
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
