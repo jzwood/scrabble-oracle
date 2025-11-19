@@ -6,7 +6,11 @@ features
 - can upload custom dictionary
 - results export
 - save results history
-
-improvements
 - add pricing page
 - add pricing
+
+improvements
+- write menu from scratch
+  - have clear board be a dialog modal
+
+

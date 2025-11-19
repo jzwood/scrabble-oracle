@@ -8,7 +8,7 @@
     />
     <link
       rel="stylesheet"
-      href="web/css/styles.css?v=225816FE-B07C-4B4C-A94A-4CC01F193F9B"
+      href="web/css/styles.css?v=D133E789-9624-4653-923C-205A85A9B8F6"
     >
     <link rel="stylesheet" href="web/static/css/tachyons-field.min.css">
     <link
@@ -54,18 +54,23 @@
             </select>
           </div>
         </div>
-        <select id="menu" class="ba b--black bg-white self-baseline">
-          <option value="menu">menu</option>
-          <option value="help">help</option>
-          <option value="clear">clear board</option>
-          <option value="activate">activate key</option>
-        </select>
+        <div>
+          <button id="menu" class="pa1">menu</button>
+          <div class="relative bw2">
+            <menu
+              class="absolute top-0 right-0 ma0 list-no pl0 pb4 bg-white hidden"
+            >
+              <li>
+                <button popovertarget="help" class="bw0 w-100 pa2">help</button>
+              </li>
+              <li><button class="bw0 w-100 pa2">clear</button></li>
+              <li><button class="bw0 w-100 pa2">activate</button></li>
+            </menu>
+          </div>
+        </div>
       </div>
       <div class="f4 fixed flex items-center gh2 right-1 bottom-1">
         <div id="loader" class="ttu"></div>
-        <button popovertarget="help">
-          help
-        </button>
       </div>
       <ul
         id="output"
@@ -76,7 +81,7 @@
     <div popover id="help" class="pa4">
       <h3 class="db mt0 mb2">scrabble oracle</h3>
       <i class="db mt0 mb3">a scrabble solver</i>
-      <h4 class="mt0 mb2"># how to use</h4>
+      <h4 class="mt0 mb2">how to use</h4>
       <p class="mt0 mb3">
         recreate your scrabble board and input your rack to see the highest
         scoring options.
@@ -94,7 +99,7 @@
     <script
       defer
       type="module"
-      src="web/javascript/index.js?v=225816FE-B07C-4B4C-A94A-4CC01F193F9B"
+      src="web/javascript/index.js?v=D133E789-9624-4653-923C-205A85A9B8F6"
     ></script>
   </body>
 </html>

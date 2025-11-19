@@ -1,4 +1,4 @@
-import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=FF45E04A-A994-4662-806C-4BAC1304B794";
+import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=B547DD7A-2F4B-468A-B4F8-E359724ADBAF";
 import {
   capitalize,
   clearBoard,
@@ -13,7 +13,7 @@ import {
   saveBoard,
   tabindex,
   WIDTH,
-} from "./utils.js?v=FF45E04A-A994-4662-806C-4BAC1304B794";
+} from "./utils.js?v=B547DD7A-2F4B-468A-B4F8-E359724ADBAF";
 
 function initBoard() {
   const board = document.getElementById("board");
@@ -107,7 +107,8 @@ async function main() {
     const board = document.getElementById("board");
     const blanks = document.getElementById("blanks");
     const rack = document.getElementById("rack");
-    const menu = document.getElementById("menu");
+    const menuLabel = document.getElementById("menu");
+    const menuOptions = document.querySelector("menu");
     const help = document.getElementById("help");
 
     initBoard();
@@ -142,31 +143,25 @@ async function main() {
         saveBoard();
       }
     });
-    //help.addEventListener('toggle', event => onPopoverClose());
+    help.addEventListener("toggle", (e) => {
+      menuOptions.classList.add("hidden");
+    });
     rack.addEventListener("input", (e) => {
       e.target.value = capitalize(e.target.value).slice(0, 7);
       calculate();
     });
     blanks.addEventListener("change", calculate);
 
-    menu.addEventListener("change", (e) => {
-      e.preventDefault();
-      const value = e.target.value;
-      menu.value = "menu";
-      switch (value) {
-        case "menu":
-          break;
+    menuLabel.addEventListener("click", (e) => {
+      menuOptions.classList.toggle("hidden");
+    });
+
+    menuLabel.addEventListener("blur", (e) => {
+      switch (e?.relatedTarget?.getAttribute("popovertarget")) {
         case "help":
-          help.togglePopover();
-          break;
-        case "clear":
-          clearBoard();
-          menu.value = "menu";
-          break;
-        case "activate":
           break;
         default:
-          break;
+          menuOptions.classList.toggle("hidden");
       }
     });
 
