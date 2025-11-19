@@ -5,6 +5,10 @@ export const LOADER = {
 };
 export const WIDTH = 15;
 
+export function isAlphaChar(char) {
+  return /^[a-zA-Z]$/.test(char);
+}
+
 export function loading(action) {
   const loader = document.getElementById("loader");
   switch (action) {

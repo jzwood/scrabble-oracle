@@ -8,7 +8,7 @@
     />
     <link
       rel="stylesheet"
-      href="web/css/styles.css?v=D133E789-9624-4653-923C-205A85A9B8F6"
+      href="web/css/styles.css?v=AF9DF7D9-977B-4627-A804-47524F5C3729"
     >
     <link rel="stylesheet" href="web/static/css/tachyons-field.min.css">
     <link
@@ -34,7 +34,7 @@
     <div class="body mh-auto pa0 pa3-m hidden">
       <div id="board"></div>
       <div class="flex-between gh2 gv1 f4 pv2 ph2 ph0-m ttl">
-        <div class="flex flex-wrap items-center ga2">
+        <div class="flex flex-wrap items-stretch ga2">
           <div>
             <label for="rack">rack</label>
             <input
@@ -63,7 +63,11 @@
               <li>
                 <button popovertarget="help" class="bw0 w-100 pa2">help</button>
               </li>
-              <li><button class="bw0 w-100 pa2">clear</button></li>
+              <li>
+                <button popovertarget="clear" class="bw0 w-100 pa2">
+                  clear
+                </button>
+              </li>
               <li><button class="bw0 w-100 pa2">activate</button></li>
             </menu>
           </div>
@@ -77,6 +81,13 @@
         class="list-no mt3 mb1 ph2 ph0-m grid cols-2 justify-start items-center gh2"
       >
       </ul>
+    </div>
+    <div popover id="clear" class="pa4">
+      <p>Are you sure you want to clear the board?</p>
+      <div class="flex justify-between">
+        <button class="no">No</button>
+        <button class="yes">Yes</button>
+      </div>
     </div>
     <div popover id="help" class="pa4">
       <h3 class="db mt0 mb2">scrabble oracle</h3>
@@ -99,7 +110,7 @@
     <script
       defer
       type="module"
-      src="web/javascript/index.js?v=D133E789-9624-4653-923C-205A85A9B8F6"
+      src="web/javascript/index.js?v=AF9DF7D9-977B-4627-A804-47524F5C3729"
     ></script>
   </body>
 </html>

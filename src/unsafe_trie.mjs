@@ -1,9 +1,9 @@
 import {
   has_key as hasKey,
   insert as updateMap,
-} from "../gleam_stdlib/gleam/dict.mjs?v=8CDCC133-6928-4DA5-8299-A248D0706832";
-import { new_map as emptyMap } from "../gleam_stdlib/gleam_stdlib.mjs?v=8CDCC133-6928-4DA5-8299-A248D0706832";
-import { Trie } from "./trie.mjs?v=8CDCC133-6928-4DA5-8299-A248D0706832";
+} from "../gleam_stdlib/gleam/dict.mjs?v=80A89E98-36BA-4A37-866F-014CA454F420";
+import { new_map as emptyMap } from "../gleam_stdlib/gleam_stdlib.mjs?v=80A89E98-36BA-4A37-866F-014CA454F420";
+import { Trie } from "./trie.mjs?v=80A89E98-36BA-4A37-866F-014CA454F420";
 
 function empty() {
   return new Trie(false, emptyMap());

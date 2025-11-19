@@ -1,10 +1,11 @@
-import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=B547DD7A-2F4B-468A-B4F8-E359724ADBAF";
+import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=5D529E8B-D008-4870-8CEC-D80AFC862223";
 import {
   capitalize,
   clearBoard,
   debounce,
   DIRECTION_DOWN_CLASS,
   focus,
+  isAlphaChar,
   isDirectionDown,
   LOADER,
   loading,
@@ -13,9 +14,9 @@ import {
   saveBoard,
   tabindex,
   WIDTH,
-} from "./utils.js?v=B547DD7A-2F4B-468A-B4F8-E359724ADBAF";
+} from "./utils.js?v=5D529E8B-D008-4870-8CEC-D80AFC862223";
 
-function initBoard() {
+function initBoard(calculate) {
   const board = document.getElementById("board");
   const chars = raw_board.replace(/\s/g, "");
 
@@ -36,8 +37,8 @@ function initBoard() {
       const key = e.key;
       const isBackspace = key === "Backspace";
       const isEmpty = cell.textContent.length === 0;
-      if (/^[a-zA-Z]$/.test(key)) {
-        // DO NOTHING
+      if (isAlphaChar(key)) {
+        calculate();
       } else if (isBackspace && isEmpty) {
         focus(cell, false);
       } else if (isBackspace && !isEmpty) {
@@ -110,17 +111,9 @@ async function main() {
     const menuLabel = document.getElementById("menu");
     const menuOptions = document.querySelector("menu");
     const help = document.getElementById("help");
+    const clear = document.getElementById("clear");
 
-    initBoard();
-    restoreBoard();
-    loading(LOADER.START);
-    body.classList.remove("hidden");
-
-    //const onPopoverClose = event => {
-    //if (event.newState === 'closed') {}
-    //}
-
-    const calculate = debounce(() => {
+    const calculate = () => {
       const rackStr = rack.value;
       if (rackStr.length > 0) {
         const blanksInt = parseInt(blanks.selectedOptions[0].value, 10);
@@ -135,7 +128,22 @@ async function main() {
         });
         loading(LOADER.START);
       }
-    }, 500);
+    };
+    const calculate500 = debounce(calculate, 500);
+    const calculate1000 = debounce(calculate, 1000);
+
+    initBoard(calculate1000);
+    restoreBoard();
+    loading(LOADER.START);
+    body.classList.remove("hidden");
+
+    const closeMenu = () => menuOptions.classList.add("hidden");
+    const toggleMenu = () => menuOptions.classList.toggle("hidden");
+    const onPopoverClose = (event) => {
+      if (event.newState === "closed") {
+        closeMenu();
+      }
+    };
 
     document.addEventListener("visibilitychange", function () {
       // THEORETICALLY WILL BE CALLED WHEN TAB IS REFRESHED
@@ -143,32 +151,35 @@ async function main() {
         saveBoard();
       }
     });
-    help.addEventListener("toggle", (e) => {
-      menuOptions.classList.add("hidden");
+    help.addEventListener("toggle", onPopoverClose);
+    clear.addEventListener("toggle", onPopoverClose);
+    clear.querySelector(".no").addEventListener("click", () => {
+      clear.hidePopover();
+    });
+    clear.querySelector(".yes").addEventListener("click", () => {
+      clearBoard();
+      clear.hidePopover();
     });
     rack.addEventListener("input", (e) => {
       e.target.value = capitalize(e.target.value).slice(0, 7);
-      calculate();
+      calculate500();
     });
-    blanks.addEventListener("change", calculate);
+    blanks.addEventListener("change", calculate500);
 
-    menuLabel.addEventListener("click", (e) => {
-      menuOptions.classList.toggle("hidden");
-    });
+    menuLabel.addEventListener("click", toggleMenu);
 
     menuLabel.addEventListener("blur", (e) => {
-      switch (e?.relatedTarget?.getAttribute("popovertarget")) {
+      const target = e?.relatedTarget?.getAttribute("popovertarget");
+      switch (target) {
         case "help":
+        case "clear":
           break;
         default:
-          menuOptions.classList.toggle("hidden");
+          closeMenu();
       }
     });
 
-    if (rack.value.length > 0) {
-      calculate();
-    }
-
+    calculate();
     loading(LOADER.STOP);
   } catch (err) {
     console.error(err);
