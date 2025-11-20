@@ -14,7 +14,7 @@ pub fn main() -> Nil {
   gleeunit.main()
 }
 
-const words_path = "web/static/text/word_list.txt"
+const words_path = "web/static/text/enable.txt"
 
 const board = "
   4__B___N___1__4

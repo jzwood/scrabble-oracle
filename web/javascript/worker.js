@@ -4,7 +4,7 @@ import { Empty } from "../../build/dev/javascript/prelude.mjs?v=6227C7D3-EF42-4E
 import { unwrap } from "../../build/dev/javascript/gleam_stdlib/gleam/result.mjs?v=6227C7D3-EF42-4EB5-8D1C-EAE876C560F9";
 
 const WORDS_FPATH =
-  "../static/text/word_list.txt?v=6227C7D3-EF42-4EB5-8D1C-EAE876C560F9";
+  "../static/text/enable.txt?v=6227C7D3-EF42-4EB5-8D1C-EAE876C560F9";
 const LIMIT = 25;
 
 let dictionary;
