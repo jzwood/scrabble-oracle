@@ -75,11 +75,20 @@ function showPlayspot(playspot) {
 
 function updateResults(results) {
   const output = document.getElementById("output");
+  if (results.length === 0) {
+    output.classList.remove("grid");
+    const message = document.createElement("div");
+    message.textContent = "no playable words";
+    output.replaceChildren(message);
+    return null;
+  }
+  const padLeft = results[0][2].toString().length;
   const lis = results.map(([word, playspot, score]) => {
     const li = document.createElement("li");
-    li.className = "dc f4";
+    li.className = "gh2 f4";
+    li.style.display = "inline-flex";
     const scoreSpan = document.createElement("span");
-    scoreSpan.textContent = score;
+    scoreSpan.textContent = score.toString().padStart(padLeft, " ");
     scoreSpan.className = "tr";
     const wordButton = document.createElement("button");
     wordButton.textContent = word.toUpperCase();
@@ -91,6 +100,15 @@ function updateResults(results) {
     return li;
   });
   output.replaceChildren(...lis);
+  output.style["grid-template-columns"] = "";
+  output.classList.remove("grid");
+  const width = Array.from(output.children).reduce((acc, child) => {
+    const { width } = child.getBoundingClientRect();
+    return width > acc ? width : acc;
+  }, 0);
+  output.classList.add("grid");
+  output.style["grid-template-columns"] =
+    `repeat(auto-fit, minmax(${width}px, ${width}px))`;
 }
 
 async function main() {
@@ -101,6 +119,7 @@ async function main() {
       loading(LOADER.STOP);
     };
     worker.onerror = (err) => {
+      loading(LOADER.STOP);
       console.error(err);
     };
 
@@ -180,7 +199,6 @@ async function main() {
     });
 
     calculate();
-    loading(LOADER.STOP);
   } catch (err) {
     console.error(err);
   }

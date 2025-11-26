@@ -3,6 +3,7 @@ export const LOADER = {
   START: Symbol("start"),
   STOP: Symbol("stop"),
 };
+
 export const WIDTH = 15;
 
 export function isAlphaChar(char) {
