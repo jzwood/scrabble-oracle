@@ -8,7 +8,7 @@
     />
     <link
       rel="stylesheet"
-      href="web/css/styles.css?v=AF9DF7D9-977B-4627-A804-47524F5C3729"
+      href="web/css/styles.css?v=3A998946-0ECC-46B1-9023-E0A3FED93D04"
     >
     <link rel="stylesheet" href="web/static/css/tachyons-field.min.css">
     <link
@@ -68,7 +68,11 @@
                   clear
                 </button>
               </li>
-              <li><button class="bw0 w-100 pa2">activate</button></li>
+              <li>
+                <button popovertarget="pricing" class="bw0 w-100 pa2">
+                  pricing
+                </button>
+              </li>
             </menu>
           </div>
         </div>
@@ -107,10 +111,17 @@
         </ul>
       </details>
     </div>
+    <div popover id="pricing" class="pa4">
+      <p>pricing</p>
+      <div class="flex justify-between">
+        <button class="no">No</button>
+        <button class="yes">Yes</button>
+      </div>
+    </div>
     <script
       defer
       type="module"
-      src="web/javascript/index.js?v=AF9DF7D9-977B-4627-A804-47524F5C3729"
+      src="web/javascript/index.js?v=3A998946-0ECC-46B1-9023-E0A3FED93D04"
     ></script>
   </body>
 </html>

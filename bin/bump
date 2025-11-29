@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-find . -type f \( -name "*.js" -o -name "*mjs" -o -name "*.html" -o -name "*.css" \) -exec sh -c '
+find -f index.html ./web -type f \( -name "*.js" -o -name "*mjs" -o -name "*.html" -o -name "*.css" \) -exec sh -c '
 for file do
       sed -i "" -E "s/v=[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/v=$(uuidgen)/g" "$file"
     done

@@ -1,4 +1,5 @@
-@import "theme.css?v=FEF740AE-3F31-4CBB-B5A4-781102261B1C";
+@import "theme.css?v=C2C5A9DB-5A3F-4766-A27C-05C1C9ACB44B";
+@import "tables.css?v=C2C5A9DB-5A3F-4766-A27C-05C1C9ACB44B";
 
 html, body {
   margin: 0;
@@ -94,6 +95,12 @@ body.direction-down
 @media (48rem <= width) {
   #about {
     max-width: calc(100% - 3rem);
+  }
+}
+
+#pricing {
+  & th, td {
+    padding: 0.25rem 0.5rem;
   }
 }
 

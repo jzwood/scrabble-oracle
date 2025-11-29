@@ -1,4 +1,4 @@
-import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=5D529E8B-D008-4870-8CEC-D80AFC862223";
+import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=B7542523-C379-4AE3-9303-74C09EB88A00";
 import {
   capitalize,
   clearBoard,
@@ -14,7 +14,7 @@ import {
   saveBoard,
   tabindex,
   WIDTH,
-} from "./utils.js?v=5D529E8B-D008-4870-8CEC-D80AFC862223";
+} from "./utils.js?v=B7542523-C379-4AE3-9303-74C09EB88A00";
 
 function initBoard(calculate) {
   const board = document.getElementById("board");
@@ -192,6 +192,7 @@ async function main() {
       switch (target) {
         case "help":
         case "clear":
+        case "pricing":
           break;
         default:
           closeMenu();
