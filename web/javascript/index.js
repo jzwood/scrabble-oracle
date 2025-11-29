@@ -1,4 +1,4 @@
-import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=64F45D57-35C8-4A20-AEE2-CCC26233E386";
+import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=6517E3F6-1285-4480-8BB7-5FF561E4D041";
 import {
   capitalize,
   clearBoard,
@@ -14,7 +14,7 @@ import {
   saveBoard,
   tabindex,
   WIDTH,
-} from "./utils.js?v=64F45D57-35C8-4A20-AEE2-CCC26233E386";
+} from "./utils.js?v=6517E3F6-1285-4480-8BB7-5FF561E4D041";
 
 function initBoard(calculate) {
   const board = document.getElementById("board");

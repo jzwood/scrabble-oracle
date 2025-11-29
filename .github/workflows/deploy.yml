@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
@@ -20,7 +20,7 @@ jobs:
       - run: gleam test
       - run: gleam format --check src test
       - run: gleam build --warnings-as-errors
-      - run: bash bin/bump
+      #- run: bash bin/bump
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
