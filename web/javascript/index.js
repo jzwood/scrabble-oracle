@@ -16,6 +16,8 @@ import {
   WIDTH,
 } from "./utils.js?v=6517E3F6-1285-4480-8BB7-5FF561E4D041";
 
+const saveBoard1000 = debounce(saveBoard, 1000);
+
 function initBoard(calculate) {
   const board = document.getElementById("board");
   const chars = raw_board.replace(/\s/g, "");
@@ -39,10 +41,13 @@ function initBoard(calculate) {
       const isEmpty = cell.textContent.length === 0;
       if (isAlphaChar(key)) {
         calculate();
+        saveBoard1000();
       } else if (isBackspace && isEmpty) {
         focus(cell, false);
       } else if (isBackspace && !isEmpty) {
         cell.textContent = "";
+        calculate();
+        saveBoard1000();
       } else if (key === "Enter" || /^[0-9]$/.test(key)) {
         document.body.classList.toggle(DIRECTION_DOWN_CLASS);
         resetTabindex();
@@ -102,10 +107,12 @@ function updateResults(results) {
   output.replaceChildren(...lis);
   output.style["grid-template-columns"] = "";
   output.classList.remove("grid");
-  const width = Array.from(output.children).reduce((acc, child) => {
-    const { width } = child.getBoundingClientRect();
-    return width > acc ? width : acc;
-  }, 0);
+  const width = Math.trunc(
+    Array.from(output.children).reduce((acc, child) => {
+      const { width } = child.getBoundingClientRect();
+      return width > acc ? width : acc;
+    }, 0),
+  );
   output.classList.add("grid");
   output.style["grid-template-columns"] =
     `repeat(auto-fit, minmax(${width}px, ${width}px))`;
@@ -131,6 +138,7 @@ async function main() {
     const menuOptions = document.querySelector("menu");
     const help = document.getElementById("help");
     const clear = document.getElementById("clear");
+    const output = document.getElementById("output");
 
     const calculate = () => {
       const rackStr = rack.value;
@@ -162,13 +170,6 @@ async function main() {
         closeMenu();
       }
     };
-
-    document.addEventListener("visibilitychange", function () {
-      // THEORETICALLY WILL BE CALLED WHEN TAB IS REFRESHED
-      if (document.visibilityState == "hidden") {
-        saveBoard();
-      }
-    });
     help.addEventListener("toggle", onPopoverClose);
     clear.addEventListener("toggle", onPopoverClose);
     clear.querySelector(".no").addEventListener("click", () => {
@@ -176,6 +177,8 @@ async function main() {
     });
     clear.querySelector(".yes").addEventListener("click", () => {
       clearBoard();
+      saveBoard();
+      output.replaceChildren();
       clear.hidePopover();
     });
     rack.addEventListener("input", (e) => {
