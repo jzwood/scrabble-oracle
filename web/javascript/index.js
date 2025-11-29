@@ -1,4 +1,4 @@
-import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=B7542523-C379-4AE3-9303-74C09EB88A00";
+import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=64F45D57-35C8-4A20-AEE2-CCC26233E386";
 import {
   capitalize,
   clearBoard,
@@ -14,7 +14,7 @@ import {
   saveBoard,
   tabindex,
   WIDTH,
-} from "./utils.js?v=B7542523-C379-4AE3-9303-74C09EB88A00";
+} from "./utils.js?v=64F45D57-35C8-4A20-AEE2-CCC26233E386";
 
 function initBoard(calculate) {
   const board = document.getElementById("board");
@@ -153,7 +153,6 @@ async function main() {
 
     initBoard(calculate1000);
     restoreBoard();
-    loading(LOADER.START);
     body.classList.remove("hidden");
 
     const closeMenu = () => menuOptions.classList.add("hidden");

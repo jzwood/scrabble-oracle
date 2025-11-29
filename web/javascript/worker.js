@@ -1,10 +1,10 @@
-import * as scrabble from "../../build/dev/javascript/scrabble/scrabble.mjs?v=DE9B778E-8119-41AF-AA23-5AD2DF4712AB";
-import * as trie from "../../build/dev/javascript/scrabble/trie.mjs?v=DE9B778E-8119-41AF-AA23-5AD2DF4712AB";
-import { Empty } from "../../build/dev/javascript/prelude.mjs?v=DE9B778E-8119-41AF-AA23-5AD2DF4712AB";
-import { unwrap } from "../../build/dev/javascript/gleam_stdlib/gleam/result.mjs?v=DE9B778E-8119-41AF-AA23-5AD2DF4712AB";
+import * as scrabble from "../../build/dev/javascript/scrabble/scrabble.mjs?v=45173C8C-30C8-4958-8B8D-91C4ED0E1C81";
+import * as trie from "../../build/dev/javascript/scrabble/trie.mjs?v=45173C8C-30C8-4958-8B8D-91C4ED0E1C81";
+import { Empty } from "../../build/dev/javascript/prelude.mjs?v=45173C8C-30C8-4958-8B8D-91C4ED0E1C81";
+import { unwrap } from "../../build/dev/javascript/gleam_stdlib/gleam/result.mjs?v=45173C8C-30C8-4958-8B8D-91C4ED0E1C81";
 
 const WORDS_FPATH =
-  "../static/text/enable.txt?v=DE9B778E-8119-41AF-AA23-5AD2DF4712AB";
+  "../static/text/enable.txt?v=45173C8C-30C8-4958-8B8D-91C4ED0E1C81";
 const LIMIT = 25;
 
 let dictionary;
