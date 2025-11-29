@@ -68,6 +68,10 @@ export function capitalize(value) {
   return value.toUpperCase().replace(/[^A-Z]/g, "");
 }
 
+export function lowercase(value) {
+  return value.toLowerCase().replace(/[^a-z]/g, "");
+}
+
 export function saveBoard() {
   const board = document.getElementById("board");
   const state = Array.from(board.children).map((cell) =>

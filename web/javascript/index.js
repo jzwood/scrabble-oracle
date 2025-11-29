@@ -9,6 +9,7 @@ import {
   isDirectionDown,
   LOADER,
   loading,
+  lowercase,
   resetTabindex,
   restoreBoard,
   saveBoard,
@@ -30,6 +31,13 @@ function initBoard(calculate) {
     cell.setAttribute("tabindex", tabindex(index, false));
     cell.setAttribute("contenteditable", "plaintext-only");
     cell.addEventListener("input", (e) => {
+      if (e.data === "0") {
+        cell.textContent = lowercase(cell.textContent);
+        calculate();
+        saveBoard1000();
+        return null;
+      }
+
       cell.textContent = capitalize(cell.textContent).slice(0, 1);
       if (cell.textContent.length > 0) {
         focus(cell, true);
@@ -48,9 +56,11 @@ function initBoard(calculate) {
         cell.textContent = "";
         calculate();
         saveBoard1000();
-      } else if (key === "Enter" || /^[0-9]$/.test(key)) {
+      } else if (key === "Enter" || /^[1-9]$/.test(key)) {
         document.body.classList.toggle(DIRECTION_DOWN_CLASS);
         resetTabindex();
+      } else if (key === "0") {
+        // DO NOTHING
       } else if (key === "ArrowUp") {
         focus(cell, false, true);
       } else if (key === "ArrowRight") {
