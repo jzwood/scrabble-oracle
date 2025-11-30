@@ -1,4 +1,4 @@
-import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=6517E3F6-1285-4480-8BB7-5FF561E4D041";
+import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=98C269EC-2071-423B-A746-73D8F478361B";
 import {
   capitalize,
   clearBoard,
@@ -15,7 +15,7 @@ import {
   saveBoard,
   tabindex,
   WIDTH,
-} from "./utils.js?v=6517E3F6-1285-4480-8BB7-5FF561E4D041";
+} from "./utils.js?v=98C269EC-2071-423B-A746-73D8F478361B";
 
 const saveBoard1000 = debounce(saveBoard, 1000);
 
@@ -78,11 +78,16 @@ function initBoard(calculate) {
   });
 }
 
-function showPlayspot(playspot) {
+function clearPlayspots() {
   const board = document.getElementById("board");
   for (let cell of board.children) {
     cell.classList.remove("active");
   }
+}
+
+function showPlayspot(playspot) {
+  clearPlayspots()
+  const board = document.getElementById("board");
   playspot.forEach(({ x, y }) => {
     board.children[y * WIDTH + x].classList.add("active");
   });
@@ -98,20 +103,34 @@ function updateResults(results) {
     return null;
   }
   const padLeft = results[0][2].toString().length;
-  const lis = results.map(([word, playspot, score]) => {
+  const lis = results.map(([word, playspot, score], index) => {
+    const key = index + word;
     const li = document.createElement("li");
-    li.className = "gh2 f4";
+    li.className = "gh2 f4 items-center";
     li.style.display = "inline-flex";
     const scoreSpan = document.createElement("span");
     scoreSpan.textContent = score.toString().padStart(padLeft, " ");
     scoreSpan.className = "tr";
-    const wordButton = document.createElement("button");
-    wordButton.textContent = word.toUpperCase();
-    wordButton.className = "bw0 tl";
-    wordButton.addEventListener("click", () => {
-      showPlayspot(playspot);
+    const wordInput = document.createElement("input");
+    wordInput.setAttribute("type", "radio");
+    wordInput.setAttribute("name", "word");
+    wordInput.setAttribute("id", key);
+    wordInput.className = "dn";
+    const wordLabel = document.createElement("label");
+    wordLabel.setAttribute("for", key);
+    wordLabel.textContent = word.toUpperCase();
+    wordLabel.className = "tl button pa1 bw1 b--light-silver";
+    wordLabel.style.userSelect = 'none';
+    wordLabel.addEventListener("click", (e) => {
+      if (wordInput.checked) {
+        e.preventDefault()
+        clearPlayspots();
+        wordInput.checked = false
+      } else {
+        showPlayspot(playspot);
+      }
     });
-    li.append(scoreSpan, wordButton);
+    li.append(scoreSpan, wordInput, wordLabel);
     return li;
   });
   output.replaceChildren(...lis);
@@ -148,6 +167,7 @@ async function main() {
     const menuOptions = document.querySelector("menu");
     const help = document.getElementById("help");
     const clear = document.getElementById("clear");
+    const pricing = document.getElementById("pricing");
     const output = document.getElementById("output");
 
     const calculate = () => {
@@ -182,6 +202,7 @@ async function main() {
     };
     help.addEventListener("toggle", onPopoverClose);
     clear.addEventListener("toggle", onPopoverClose);
+    pricing.addEventListener("toggle", onPopoverClose);
     clear.querySelector(".no").addEventListener("click", () => {
       clear.hidePopover();
     });

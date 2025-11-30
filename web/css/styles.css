@@ -1,5 +1,5 @@
-@import "theme.css?v=66959BDD-7B2E-44FD-AC06-1B2A0ADCA1AA";
-@import "tables.css?v=66959BDD-7B2E-44FD-AC06-1B2A0ADCA1AA";
+@import "theme.css?v=6280BBF3-3276-4F02-BFEB-0B02EAB85BCD";
+@import "tables.css?v=6280BBF3-3276-4F02-BFEB-0B02EAB85BCD";
 
 html, body {
   margin: 0;
@@ -12,11 +12,22 @@ html, body {
   max-width: 75vh;
 }
 
-button {
-  border: 2px solid black;
+button, .button {
+  border: 1px solid black;
 }
 
-select, button {
+.button {
+  background-color: #e9e9ed;
+  &:hover {
+    background-color: #d0d0d7;
+  }
+}
+
+.active, *:checked ~ label {
+  background-color: var(--active) !important;
+}
+
+select, button, label {
   cursor: pointer;
 }
 
@@ -53,9 +64,6 @@ select, input {
     &.cell-4 {
       background-color: var(--triple-word-color);
       /* &::after { content: "3W"; } */
-    }
-    &.active {
-      background-color: #a6d1d6;
     }
     &:focus {
       outline: 2px solid blue;
