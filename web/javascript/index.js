@@ -167,7 +167,7 @@ async function main() {
     const menuOptions = document.querySelector("menu");
     const help = document.getElementById("help");
     const clear = document.getElementById("clear");
-    const pricing = document.getElementById("pricing");
+    const donate = document.getElementById("donate");
     const output = document.getElementById("output");
 
     const calculate = () => {
@@ -202,7 +202,10 @@ async function main() {
     };
     help.addEventListener("toggle", onPopoverClose);
     clear.addEventListener("toggle", onPopoverClose);
-    pricing.addEventListener("toggle", onPopoverClose);
+    donate.addEventListener("toggle", onPopoverClose);
+    donate.querySelector(".close").addEventListener("click", () => {
+      donate.hidePopover();
+    });
     clear.querySelector(".no").addEventListener("click", () => {
       clear.hidePopover();
     });
@@ -225,7 +228,7 @@ async function main() {
       switch (target) {
         case "help":
         case "clear":
-        case "pricing":
+        case "donate":
           break;
         default:
           closeMenu();

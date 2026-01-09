@@ -1,16 +1,5 @@
 features
-- see exactly where on the board the play goes
-- legend for bonus tiles
-- more results
-- maybe 2-5 results are blurred out on free tier
+- legend for bonus tiles (?)
 - can upload custom dictionary
 - results export
 - save results history
-- add pricing page
-- add pricing
-
-improvements
-- write menu from scratch
-  - have clear board be a dialog modal
-
-
