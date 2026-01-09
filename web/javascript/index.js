@@ -1,4 +1,4 @@
-import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=98C269EC-2071-423B-A746-73D8F478361B";
+import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=264A19DF-844E-4561-9883-3FD357E50327";
 import {
   capitalize,
   clearBoard,
@@ -15,7 +15,7 @@ import {
   saveBoard,
   tabindex,
   WIDTH,
-} from "./utils.js?v=98C269EC-2071-423B-A746-73D8F478361B";
+} from "./utils.js?v=264A19DF-844E-4561-9883-3FD357E50327";
 
 const saveBoard1000 = debounce(saveBoard, 1000);
 
@@ -86,7 +86,7 @@ function clearPlayspots() {
 }
 
 function showPlayspot(playspot) {
-  clearPlayspots()
+  clearPlayspots();
   const board = document.getElementById("board");
   playspot.forEach(({ x, y }) => {
     board.children[y * WIDTH + x].classList.add("active");
@@ -120,12 +120,12 @@ function updateResults(results) {
     wordLabel.setAttribute("for", key);
     wordLabel.textContent = word.toUpperCase();
     wordLabel.className = "tl button pa1 bw1 b--light-silver";
-    wordLabel.style.userSelect = 'none';
+    wordLabel.style.userSelect = "none";
     wordLabel.addEventListener("click", (e) => {
       if (wordInput.checked) {
-        e.preventDefault()
+        e.preventDefault();
         clearPlayspots();
-        wordInput.checked = false
+        wordInput.checked = false;
       } else {
         showPlayspot(playspot);
       }

@@ -99,3 +99,28 @@ export function clearBoard() {
     cell.classList.remove("active");
   }
 }
+
+function isLicenseWellFormed(license) {
+  // ehhh we don't know this will work
+  return /^[A-F0-9]{8}-[A-F0-9]{8}-[A-F0-9]{8}-[A-F0-9]{8}$/.test(license);
+}
+
+export function isPro() {
+  const key = localStorage.getItem("key");
+}
+
+export function validateProKey(licenseKey) {
+  const URL = "https://api.gumroad.com/v2/licenses/verify";
+  const PRODUCT_KEY = "1649385009254";
+  return fetch(URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({
+      product_id: PRODUCT_KEY,
+      license_key: licenseKey,
+    }),
+  })
+    .then((res) => res.json());
+}
