@@ -1,8 +1,11 @@
 # Scrabble Oracle
 
-<img src="web/static/img/demo.png">
+<a href="https://jzwood.github.io/scrabble-oracle/" target="_blank">
+   <img src="web/static/img/demo.png">
+</a>
 
 ## About
+
 Scrabble Oracle finds the best plays given a scrabble board and rack.
 
 ## Development
@@ -58,4 +61,3 @@ gleam build
 
 - https://www.cs.cmu.edu/afs/cs/academic/class/15451-s06/www/lectures/scrabble.pdf
 - https://github.com/jzwood/ScrabbleOracle
-
