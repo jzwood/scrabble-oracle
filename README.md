@@ -1,4 +1,22 @@
-# scrabble
+# Scrabble Oracle
+
+<img src="web/static/img/demo.png">
+
+## About
+Scrabble Oracle finds the best plays given a scrabble board and rack.
+
+## Development
+
+```sh
+gleam test
+gleam build
+```
+
+```sh
+./bin/format  # formats JS code
+./bin/local   # runs dev server
+./bin/bump    # increments version
+```
 
 ## Prior Art
 
@@ -40,10 +58,3 @@
 - Playspot
   - a list of cells
   - e.g. `[(x,y),(x,y),(x,y),(x,y),(x,y),(x,y),(x,y),(x,y)]`
-
-## Development
-
-```sh
-gleam test
-gleam build
-```
