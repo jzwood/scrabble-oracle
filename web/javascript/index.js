@@ -1,4 +1,4 @@
-import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=D3DF143E-4DB7-4358-A3C5-6ADD8B8F4FA0";
+import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=E9D40A65-8499-4DB3-9E7D-37FF93DFB0A8";
 import {
   capitalize,
   clearBoard,
@@ -15,7 +15,7 @@ import {
   saveBoard,
   tabindex,
   WIDTH,
-} from "./utils.js?v=D3DF143E-4DB7-4358-A3C5-6ADD8B8F4FA0";
+} from "./utils.js?v=E9D40A65-8499-4DB3-9E7D-37FF93DFB0A8";
 
 const saveBoard1000 = debounce(saveBoard, 1000);
 
@@ -169,6 +169,7 @@ async function main() {
     const clear = document.getElementById("clear");
     const donate = document.getElementById("donate");
     const output = document.getElementById("output");
+    const avocado = document.getElementById("avocado");
 
     const calculate = () => {
       const rackStr = rack.value;
@@ -200,6 +201,9 @@ async function main() {
         closeMenu();
       }
     };
+    avocado.addEventListener("click", () => {
+      donate.showPopover();
+    });
     help.addEventListener("toggle", onPopoverClose);
     clear.addEventListener("toggle", onPopoverClose);
     donate.addEventListener("toggle", onPopoverClose);
