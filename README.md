@@ -18,11 +18,6 @@ gleam build
 ./bin/bump    # increments version
 ```
 
-## Prior Art
-
-- https://www.cs.cmu.edu/afs/cs/academic/class/15451-s06/www/lectures/scrabble.pdf
-- https://github.com/jzwood/ScrabbleOracle
-
 ## Algorithm
 
 1. precompute trie from word list.
@@ -58,3 +53,9 @@ gleam build
 - Playspot
   - a list of cells
   - e.g. `[(x,y),(x,y),(x,y),(x,y),(x,y),(x,y),(x,y),(x,y)]`
+
+## Prior Art
+
+- https://www.cs.cmu.edu/afs/cs/academic/class/15451-s06/www/lectures/scrabble.pdf
+- https://github.com/jzwood/ScrabbleOracle
+
