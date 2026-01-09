@@ -1,5 +1,5 @@
-@import "theme.css?v=8F6AC300-DA94-42A3-B3FE-D49D46F5B67E";
-@import "tables.css?v=8F6AC300-DA94-42A3-B3FE-D49D46F5B67E";
+@import "theme.css?v=86F34212-BBDB-4EBB-BB35-ADB22ADB725D";
+@import "tables.css?v=86F34212-BBDB-4EBB-BB35-ADB22ADB725D";
 
 html, body {
   margin: 0;
@@ -104,6 +104,10 @@ body.direction-down
   #about {
     max-width: calc(100% - 3rem);
   }
+}
+
+#help {
+  max-width: 75vh;
 }
 
 #pricing {

@@ -1,4 +1,4 @@
-import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=264A19DF-844E-4561-9883-3FD357E50327";
+import { raw_board } from "../../build/dev/javascript/scrabble/board.mjs?v=94F5FEDB-D5FF-429D-A661-8ADD78790698";
 import {
   capitalize,
   clearBoard,
@@ -15,7 +15,7 @@ import {
   saveBoard,
   tabindex,
   WIDTH,
-} from "./utils.js?v=264A19DF-844E-4561-9883-3FD357E50327";
+} from "./utils.js?v=94F5FEDB-D5FF-429D-A661-8ADD78790698";
 
 const saveBoard1000 = debounce(saveBoard, 1000);
 

@@ -1,10 +1,10 @@
-import * as scrabble from "../../build/dev/javascript/scrabble/scrabble.mjs?v=8627BA62-A4B7-4837-89CD-5383E1FEAF7B";
-import * as trie from "../../build/dev/javascript/scrabble/trie.mjs?v=8627BA62-A4B7-4837-89CD-5383E1FEAF7B";
-import { Empty } from "../../build/dev/javascript/prelude.mjs?v=8627BA62-A4B7-4837-89CD-5383E1FEAF7B";
-import { unwrap } from "../../build/dev/javascript/gleam_stdlib/gleam/result.mjs?v=8627BA62-A4B7-4837-89CD-5383E1FEAF7B";
+import * as scrabble from "../../build/dev/javascript/scrabble/scrabble.mjs?v=1BFC74D6-970C-4602-857F-B14ACBDF960F";
+import * as trie from "../../build/dev/javascript/scrabble/trie.mjs?v=1BFC74D6-970C-4602-857F-B14ACBDF960F";
+import { Empty } from "../../build/dev/javascript/prelude.mjs?v=1BFC74D6-970C-4602-857F-B14ACBDF960F";
+import { unwrap } from "../../build/dev/javascript/gleam_stdlib/gleam/result.mjs?v=1BFC74D6-970C-4602-857F-B14ACBDF960F";
 
 const WORDS_FPATH =
-  "../static/text/sowpods.txt?v=8627BA62-A4B7-4837-89CD-5383E1FEAF7B";
+  "../static/text/sowpods.txt?v=1BFC74D6-970C-4602-857F-B14ACBDF960F";
 const LIMIT = 25;
 
 let dictionary;

@@ -8,7 +8,7 @@
     />
     <link
       rel="stylesheet"
-      href="web/css/styles.css?v=470FE05C-2245-4E3F-9219-2D5F345E85BD"
+      href="web/css/styles.css?v=011330F0-F942-48C2-B889-37FA933E12E0"
     >
     <link rel="stylesheet" href="web/static/css/tachyons-field.min.css">
     <link
@@ -100,16 +100,31 @@
       <i class="db mt0 mb3">a scrabble solver</i>
       <h4 class="mt0 mb2">how to use</h4>
       <p class="mt0 mb3">
-        recreate your scrabble board and input your rack to see the highest
-        scoring options.
+        <ol class="li3 mv0">
+          <li>
+            click a tile then input letters to recreate your IRL scrabble board
+          </li>
+          <li>in the input field, type your rack letters</li>
+          <li>in the dropdown, specify the number of blanks in your rack</li>
+        </ol>
+        <div class="ml3 mt2">see the highest scoring options!</div>
       </p>
       <details class="ma0">
         <summary>
           <h4 class="di">advanced</h4>
         </summary>
         <ul class="li3 mv0">
-          <li>1-9 and return toggle input direction.</li>
-          <li>0 makes played tile a blank (ie worth 0 points).</li>
+          <li>
+            while a tile is selected, type <strong>1-9</strong> or the <strong
+            >return</strong> key to toggle the typing direction between
+            horizontal and vertical.
+          </li>
+          <li>
+            while a tile is selected, type <strong>0</strong> to make the
+            selected letter lowercase. this tells scrabble oracle that the
+            letter was played with a blank tile, and is therefore worth 0
+            points.
+          </li>
         </ul>
       </details>
     </div>
@@ -126,7 +141,7 @@
     <script
       defer
       type="module"
-      src="web/javascript/index.js?v=470FE05C-2245-4E3F-9219-2D5F345E85BD"
+      src="web/javascript/index.js?v=011330F0-F942-48C2-B889-37FA933E12E0"
     ></script>
   </body>
 </html>
